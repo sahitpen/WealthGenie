@@ -1,31 +1,37 @@
 const config = require('./db-config.js');
 const mysql = require('mysql');
+const oracle = require('oracledb');
 
-config.connectionLimit = 10;
-const connection = mysql.createPool(config);
+var connection = null;
+
+async function init() {
+  console.log("STEP 1");
+  try {
+    config.connectionLimit = 10;
+    connection = await oracle.getConnection(config);
+  } catch (err) {
+    console.error("error - " + err.message);
+  }
+}
 
 /* -------------------------------------------------- */
 /* ------------------- Route Handlers --------------- */
 /* -------------------------------------------------- */
 
-
 /* ---- Q1a (Dashboard) ---- */
 // Equivalent to: function getTop20Keywords(req, res) {}
-const getTop20Keywords = (req, res) => {
-  const query = `
-    SELECT kwd_name 
-    FROM movie_keyword
-    GROUP BY kwd_name 
-    ORDER BY COUNT(*) DESC
-    LIMIT 20;
-  `
-  connection.query(query, (err, rows, fields) => {
-    if (err) console.log(err);
-    else {
-      console.log(rows);
-      res.json(rows);
-    }
-  });
+
+async function getTop20Keywords(req, res) {
+  await init();
+  console.log("STEP 2");
+  const query = "SELECT name FROM Stock"
+  try {
+    const result = await connection.execute(query);
+    res.json(result.rows);
+    console.log(result.rows);
+  } catch (err) {
+    console.log(err);
+  }
 };
 
 

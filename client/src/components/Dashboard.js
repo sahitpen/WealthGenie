@@ -166,6 +166,58 @@ export default class Dashboard extends React.Component {
           </div>
         </div>
 
+        <div className="container movies-container ">
+          <h3>
+            Companies&nbsp;
+            <small class="text-muted">with similar returns</small>
+          </h3>
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th scope="col">#</th>
+                <th scope="col">Company</th>
+                <th scope="col">Growth</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th scope="row">1</th>
+                <td>TSLA</td>
+                <td>23 %</td>
+              </tr>
+              <tr>
+                <th scope="row">2</th>
+                <td>KO</td>
+                <td>21 %</td>
+              </tr>
+              <tr>
+                <th scope="row">3</th>
+                <td>SPY</td>
+                <td>20.5 %</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <br />
+
+        <div className="container movies-container">
+          <h3>
+            Other&nbsp;
+            <small class="text-muted">popular companies</small>
+          </h3>
+          <div class="btn-group" role="group" aria-label="Basic outlined example">
+            <button type="button" class="btn btn-outline-secondary">Apple</button>
+            <button type="button" class="btn btn-outline-secondary">Facebook</button>
+            <button type="button" class="btn btn-outline-secondary">Microsoft</button>
+            <button type="button" class="btn btn-outline-secondary">Amazon</button>
+            <button type="button" class="btn btn-outline-secondary">Tesla</button>
+            <button type="button" class="btn btn-outline-secondary">Netflix</button>
+            <button type="button" class="btn btn-outline-secondary">Alphabet</button>
+          </div>
+        </div>
+
+        <br />
 
         <div className="container movies-container">
           <div className="jumbotron">
@@ -189,7 +241,7 @@ export default class Dashboard extends React.Component {
             </div>
           </div>
         </div>
-      </div>
+      </div >
     );
   };
 };
