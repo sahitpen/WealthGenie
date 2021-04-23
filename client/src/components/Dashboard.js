@@ -9,11 +9,7 @@ export default class Dashboard extends React.Component {
   constructor(props) {
     super(props);
 
-    // The state maintained by this React Component. This component maintains the list of keywords,
-    // and a list of movies for a specified keyword.
     this.state = {
-      keywords: [],
-      movies: [],
       ticker: "",
       startDate: "",
       endDate: "",
@@ -77,43 +73,6 @@ export default class Dashboard extends React.Component {
   //     });
   // };
 
-  /* ---- Q1b (Dashboard) ---- */
-  /* Set this.state.movies to a list of <DashboardMovieRow />'s. */
-  showMovies(keyword) {
-    // Send an HTTP request to the server.
-    fetch("http://localhost:8081/keywords/" + keyword,
-      {
-        method: 'GET' // The type of HTTP request.
-      }).then(res => {
-        // Convert the response data to a JSON.
-        return res.json();
-      }, err => {
-        // Print the error if there is one.
-        console.log(err);
-      }).then(movieList => {
-        if (!movieList) return;
-
-        // Map each keyword in this.state.keywords to an HTML element:
-        // A button which triggers the showMovies function for each keyword.
-        const movieRows = movieList.map((movieObj, i) =>
-          <DashboardMovieRow
-            title={movieObj.title}
-            rating={movieObj.rating}
-            votes={movieObj.num_ratings}
-          />
-        );
-
-        // Set the state of the keywords list to the value returned by the HTTP response from the server.
-        this.setState({
-          movies: movieRows
-        });
-      }, err => {
-        // Print the error if there is one.
-        console.log(err);
-      });
-
-  };
-
   submitSearch(e) {
     const ticker = document.getElementById('tickerInput').value;
     const startDate = document.getElementById('startDateInput').value;
@@ -153,24 +112,6 @@ export default class Dashboard extends React.Component {
       }, err => {
         console.log(err);
       });
-  };
-
-  handleTickerChange(e) {
-    this.setState({
-      ticker: e.target.value
-    });
-  };
-
-  handleStartDateChange(e) {
-    this.setState({
-      startDate: e.target.value
-    });
-  };
-
-  handleEndDateChange(e) {
-    this.setState({
-      endDate: e.target.value
-    });
   };
 
   render() {
