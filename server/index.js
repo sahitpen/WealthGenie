@@ -16,11 +16,14 @@ app.use(bodyParser.urlencoded({ extended: false }));
 /* ---- (Dashboard) ---- */
 // The route localhost:8081/keywords is registered to the function
 // routes.getTop20Keywords, specified in routes.js.
-app.get('/keywords', routes.getTop20Keywords);
+app.get('/stock', routes.getTop20Keywords);
 
 
 /* ---- Q1b (Dashboard) ---- */
 app.get('/keywords/:keyword', routes.getTopMoviesWithKeyword);
+
+/* ---- (Stock Search) ---- */
+app.get('/stock/:ticker/:startDate/:endDate', routes.getStockData);
 
 
 /* ---- Q2 (Recommendations) ---- */

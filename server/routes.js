@@ -5,7 +5,6 @@ const oracle = require('oracledb');
 var connection = null;
 
 async function init() {
-  console.log("STEP 1");
   try {
     config.connectionLimit = 10;
     connection = await oracle.getConnection(config);
@@ -22,17 +21,110 @@ async function init() {
 // Equivalent to: function getTop20Keywords(req, res) {}
 
 async function getTop20Keywords(req, res) {
-  await init();
-  console.log("STEP 2");
+  await init()
   const query = "SELECT name FROM Stock"
   try {
     const result = await connection.execute(query);
     res.json(result.rows);
-    console.log(result.rows);
   } catch (err) {
     console.log(err);
   }
 };
+
+/* ---- Stock Search ---- */
+
+async function getStockData(req, res) {
+  await init()
+  var ticker = req.params.ticker;
+  var startDate = req.params.startDate;
+  var endDate = req.params.endDate;
+  console.log(ticker);
+  console.log(startDate);
+  console.log(endDate);
+  const growthQuery = `
+    WITH TickerQuotes AS (
+        SELECT ASSET_TICKER, DATE_CALENDAR, CLOSE 
+        FROM StockQuote
+        WHERE ASSET_TICKER = '${ticker}'
+    ), EarliestQuotes AS (
+        SELECT * FROM TickerQuotes 
+        WHERE DATE_CALENDAR = (CASE 
+            WHEN (SELECT MIN(DATE_CALENDAR) FROM TickerQuotes) <= TO_DATE('${startDate}') THEN TO_DATE('${startDate}')
+            ELSE (SELECT MIN(DATE_CALENDAR) FROM TickerQuotes)
+        END)
+    ), LatestQuotes AS (
+        SELECT * FROM TickerQuotes 
+        WHERE DATE_CALENDAR = (CASE 
+            WHEN (SELECT MAX(DATE_CALENDAR) FROM TickerQuotes) >= TO_DATE('${endDate}') THEN TO_DATE('${endDate}')
+            ELSE (SELECT MAX(DATE_CALENDAR) FROM TickerQuotes)
+        END)
+    )
+    SELECT eq.close as startingPrice, lq.close AS endingPrice, ROUND(((lq.close - eq.close) / eq.close * 100), 2) as percent_growth 
+    FROM LatestQuotes lq 
+    JOIN EarliestQuotes eq ON lq.asset_ticker = eq.asset_ticker
+  `
+  const priceQuery = `
+    WITH TickerQuotes AS (
+        SELECT ASSET_TICKER, DATE_CALENDAR, HIGH, LOW  
+        FROM StockQuote
+        WHERE ASSET_TICKER = '${ticker}' AND  DATE_CALENDAR >= TO_DATE('${startDate}') AND DATE_CALENDAR <= TO_DATE('${endDate}')
+    ), HighQuotes AS (
+        SELECT ASSET_TICKER, DATE_CALENDAR, HIGH FROM TickerQuotes 
+        ORDER BY HIGH DESC FETCH FIRST 1 ROWS ONLY
+    ), LowQuotes AS (
+        SELECT ASSET_TICKER, DATE_CALENDAR, LOW FROM TickerQuotes 
+        ORDER BY LOW FETCH FIRST 1 ROWS ONLY
+    ) 
+    SELECT l.low as LOW, l.DATE_CALENDAR AS lowDate, h.high as HIGH, h.DATE_CALENDAR AS highDate 
+    FROM HighQuotes h 
+    JOIN LowQuotes l ON h.ASSET_TICKER = l.ASSET_TICKER
+  `
+  const volumeQuery = `
+    WITH TickerQuotes AS (
+        SELECT ASSET_TICKER, DATE_CALENDAR, VOLUME
+        FROM StockQuote
+        WHERE ASSET_TICKER = '${ticker}' AND  DATE_CALENDAR >= TO_DATE('${startDate}') AND DATE_CALENDAR <= TO_DATE('${endDate}')
+    ), HighVolume AS (
+        SELECT ASSET_TICKER, DATE_CALENDAR as highVolumeDate, VOLUME FROM TickerQuotes 
+        ORDER BY VOLUME DESC FETCH FIRST 1 ROWS ONLY
+    ), LowVolume AS (
+        SELECT ASSET_TICKER, DATE_CALENDAR as lowVolumeDate, VOLUME FROM TickerQuotes 
+        ORDER BY VOLUME FETCH FIRST 1 ROWS ONLY
+    ), AverageVolume AS (
+        SELECT ASSET_TICKER, ROUND(AVG(VOLUME), 2) as avgVolume FROM TickerQuotes 
+        GROUP BY ASSET_TICKER
+    )
+    SELECT l.volume as LOW, lowVolumeDate, h.volume as HIGH, highVolumeDate, a.avgVolume
+    FROM HighVolume h 
+    JOIN LowVolume l ON h.ASSET_TICKER = l.ASSET_TICKER
+    JOIN AverageVolume a ON a.ASSET_TICKER = l.ASSET_TICKER
+  `
+  const changeQuery = `
+    SELECT DATE_CALENDAR, OPEN, CLOSE, ROUND(((CLOSE-OPEN)/OPEN * 100), 2) AS PERCENTCHANGE 
+    FROM STOCKQUOTE
+    WHERE ASSET_TICKER = '${ticker}' AND  DATE_CALENDAR >= TO_DATE('${startDate}') AND DATE_CALENDAR <= TO_DATE('${endDate}')
+    ORDER BY ABS(PERCENTCHANGE) DESC FETCH FIRST 1 ROWS ONLY
+  `
+  try {
+    const growthResult = await connection.execute(growthQuery);
+    console.log(growthResult.rows);
+    const priceResult = await connection.execute(priceQuery);
+    console.log(priceResult.rows);
+    const volumeResult = await connection.execute(volumeQuery);
+    console.log(volumeResult.rows);
+    const changeResult = await connection.execute(changeQuery);
+    console.log(changeResult.rows);
+    res.json({
+      "growthResult": growthResult.rows,
+      "priceResult": priceResult.rows,
+      "volumeResult": volumeResult.rows,
+      "changeResult": changeResult.rows
+    });
+  } catch (err) {
+    console.log(err);
+  }
+};
+
 
 
 /* ---- Q1b (Dashboard) ---- */
@@ -172,5 +264,6 @@ module.exports = {
   getRecs: getRecs,
   getDecades: getDecades,
   getGenres: getGenres,
-  bestMoviesPerDecadeGenre: bestMoviesPerDecadeGenre
+  bestMoviesPerDecadeGenre: bestMoviesPerDecadeGenre,
+  getStockData: getStockData
 };
