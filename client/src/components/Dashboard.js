@@ -31,11 +31,7 @@ export default class Dashboard extends React.Component {
       changeClose: ""
     };
 
-    this.showMovies = this.showMovies.bind(this);
     this.submitSearch = this.submitSearch.bind(this);
-    this.handleTickerChange = this.handleTickerChange.bind(this);
-    this.handleStartDateChange = this.handleStartDateChange.bind(this);
-    this.handleEndDateChange = this.handleEndDateChange.bind(this);
   };
 
   // // React function that is called when the page load.
@@ -189,7 +185,7 @@ export default class Dashboard extends React.Component {
           </div>
         </div>
 
-        <div className="container movies-container ">
+        <div className="container movies-container">
           <h3>
             Companies&nbsp;
             <small class="text-muted">with similar returns</small>
@@ -242,28 +238,116 @@ export default class Dashboard extends React.Component {
 
         <br />
 
-        <div className="container movies-container">
-          <div className="jumbotron">
-            <div className="h5">Keywords</div>
-            <div className="keywords-container">
-              {this.state.keywords}
+        <div className="container movies-container" >
+          <h3>
+            Industry&nbsp;
+            <small class="text-muted">analysis</small>
+          </h3>
+          <form class="form-inline my-2 my-lg-0">
+            <div class="input-group mb-3">
+              <select class="form-select form-select-border-color">
+                <option selected>Select an industry</option>
+                <option value="1">Technology</option>
+                <option value="2">Financial</option>
+                <option value="3">Retail</option>
+              </select>
+              <input type="text" id="startDateInput" class="form-control" placeholder="Start Date" aria-label="StartDate" />
+              <input type="text" id="endDateInput" class="form-control" placeholder="End Date" aria-label="EndDate" />
+              <button class="form-control btn btn-outline-success my-2 my-sm-0" onClick={this.submitSearch}>Search</button>
             </div>
-          </div>
+          </form>
+        </div>
 
-          <br />
-          <div className="jumbotron">
-            <div className="movies-container">
-              <div className="movies-header">
-                <div className="header-lg"><strong>Title</strong></div>
-                <div className="header"><strong>Rating</strong></div>
-                <div className="header"><strong>Vote Count</strong></div>
+        <br />
+
+
+        <div className="container">
+          <div class="card-columns">
+            <div class="card text-white bg-success mb-3">
+              <div class="card-header">Growth of Industry</div>
+              <div class="card-body">
+                <h5 class="card-title"><b> 5%</b></h5>
+                <p class="card-text">between 1/2/2019 and 1/2/2020.</p>
               </div>
-              <div className="results-container" id="results">
-                {this.state.movies}
+            </div>
+            <div class="card bg-light mb-3">
+              <div class="card-header">Number of Industry Stocks</div>
+              <div class="card-body">
+                <h5 class="card-title"><b> 24</b></h5>
+                <p class="card-text">industry stocks in the S&P 500.</p>
               </div>
+            </div>
+            <div class="card">
+              <table class="table table-hover">
+                <thead>
+                  <tr>
+                    <th scope="col">Top Technology Companies</th>
+                    <th scope="col">Growth</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>TSLA</td>
+                    <td>23 %</td>
+                  </tr>
+                  <tr>
+                    <td>KO</td>
+                    <td>21 %</td>
+                  </tr>
+                  <tr>
+                    <td>SPY</td>
+                    <td>20.5 %</td>
+                  </tr>
+                  <tr>
+                    <td>TSLA</td>
+                    <td>23 %</td>
+                  </tr>
+                  <tr>
+                    <td>TSLA</td>
+                    <td>23 %</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="card">
+              <table class="table table-hover">
+                <thead>
+                  <tr>
+                    <th scope="col">Worst Technology Companies</th>
+                    <th scope="col">Growth</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>TSLA</td>
+                    <td>23 %</td>
+                  </tr>
+                  <tr>
+                    <td>KO</td>
+                    <td>21 %</td>
+                  </tr>
+                  <tr>
+                    <td>SPY</td>
+                    <td>20.5 %</td>
+                  </tr>
+                  <tr>
+                    <td>SPY</td>
+                    <td>20.5 %</td>
+                  </tr>
+                  <tr>
+                    <td>SPY</td>
+                    <td>20.5 %</td>
+                  </tr>
+                </tbody>
+              </table>
             </div>
           </div>
         </div>
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
       </div >
     );
   };
