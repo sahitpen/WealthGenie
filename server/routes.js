@@ -31,6 +31,40 @@ async function getTop20Keywords(req, res) {
   }
 };
 
+/* ---- Crypto Search ---- */ 
+async function getCryptoData(req, res) {
+  await init()
+  var ticker = req.params.ticker; 
+  var startDate = req.params.startDate; 
+  var endDate = req.params.endDate; 
+
+  /*
+   *queries to be implemented 
+   */
+  const growthQuery = ``;
+  const priceQuery = ``;
+  const volumeQuery = ``;
+  const changeQuery = ``;
+  try {
+    const growthResult = await connection.execute(growthQuery);
+    console.log(growthResult.rows);
+    const priceResult = await connection.execute(priceQuery);
+    console.log(priceResult.rows);
+    const volumeResult = await connection.execute(volumeQuery);
+    console.log(volumeResult.rows);
+    const changeResult = await connection.execute(changeQuery);
+    console.log(changeResult.rows);
+    res.json({
+      "growthResult": growthResult.rows,
+      "priceResult": priceResult.rows,
+      "volumeResult": volumeResult.rows,
+      "changeResult": changeResult.rows
+    });
+  } catch (err) {
+    console.log(err);
+  }
+}
+
 /* ---- Stock Search ---- */
 
 async function getStockData(req, res) {
@@ -265,5 +299,6 @@ module.exports = {
   getDecades: getDecades,
   getGenres: getGenres,
   bestMoviesPerDecadeGenre: bestMoviesPerDecadeGenre,
-  getStockData: getStockData
+  getStockData: getStockData,
+  getCryptoData: getCryptoData
 };

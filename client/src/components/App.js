@@ -7,6 +7,7 @@ import {
 import Dashboard from './Dashboard';
 import Recommendations from './Recommendations';
 import BestMovies from './BestMovies';
+import Cryptocurrency from './Cryptocurrency';
 
 export default class App extends React.Component {
 
@@ -27,7 +28,7 @@ export default class App extends React.Component {
 						/>
 						<Route
 							path="/cryptocurrency"
-							render={() => <Recommendations />}
+							render={() => <Cryptocurrency />}
 						/>
 						<Route
 							path="/portfolio"
