@@ -159,6 +159,36 @@ async function getStockData(req, res) {
   }
 };
 
+/* ---- Portfolio ---- */
+
+async function getAssetTickers(req, res) {
+  //given a partial/full ticker, this route returns a list of tickers that start with the given query ticker
+  await init()
+  var ticker = req.params.ticker;
+  console.log(ticker);
+  const assetQuery = `
+    WITH quote AS (
+      (SELECT * FROM stock)
+      UNION
+      (SELECT ticker, name, 'Cryptocurrency' "INDUSTRY" FROM cryptocurrency)
+    )
+    SELECT *
+    FROM quote
+    WHERE ticker LIKE '${ticker}%'
+  `;
+  console.log(assetQuery);
+  try {
+    const assetsResult = await connection.execute(assetQuery);
+    console.log(assetsResult.rows);
+    res.json({
+      "assets": assetsResult.rows
+    });
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+
 
 
 /* ---- Q1b (Dashboard) ---- */
@@ -300,5 +330,6 @@ module.exports = {
   getGenres: getGenres,
   bestMoviesPerDecadeGenre: bestMoviesPerDecadeGenre,
   getStockData: getStockData,
-  getCryptoData: getCryptoData
+  getCryptoData: getCryptoData,
+  getAssetTickers: getAssetTickers,
 };
