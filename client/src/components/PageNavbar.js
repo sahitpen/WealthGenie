@@ -30,9 +30,7 @@ export default class PageNavbar extends React.Component {
 		return (
 			<div className="PageNavbar">
 				<nav className="navbar navbar-expand-lg navbar-light" style={{ backgroundColor: "#f1f2f6" }}>
-					<a class="navbar-brand" href="#">
-						<img src="https://www.flaticon.com/svg/vstatic/svg/1825/1825632.svg?token=exp=1619023282~hmac=0c2393242a6c2e9d1a70c372a3e49896" width="30" height="30" style={{ paddingTop: '8px' }}
-							class="d-inline-block align-top" alt="" />
+					<a className="navbar-brand" href="#">
 						<span className="navbar-brand center mb-0 h1" style={{ color: "#172C5B" }}><b>WealthGenie</b></span>
 					</a>
 					<div className="collapse navbar-collapse" id="navbarNavAltMarkup">
@@ -40,8 +38,8 @@ export default class PageNavbar extends React.Component {
 							{this.state.navDivs}
 						</div>
 					</div>
-					<form class="form-inline">
-						<button class="btn btn-success my-2 my-sm-0" type="submit">Login</button>
+					<form className="form-inline">
+						<button className="btn btn-success my-2 my-sm-0" type="submit">Login</button>
 					</form>
 				</nav>
 			</div>
