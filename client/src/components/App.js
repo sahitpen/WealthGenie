@@ -8,6 +8,7 @@ import Dashboard from './Dashboard';
 import Recommendations from './Recommendations';
 import BestMovies from './BestMovies';
 import Cryptocurrency from './Cryptocurrency';
+import Portfolio from './Portfolio';
 
 export default class App extends React.Component {
 
@@ -32,7 +33,7 @@ export default class App extends React.Component {
 						/>
 						<Route
 							path="/portfolio"
-							render={() => <BestMovies />}
+							render={() => <Portfolio />}
 						/>
 					</Switch>
 				</Router>
