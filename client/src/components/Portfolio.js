@@ -8,13 +8,37 @@ export default class Portfolio extends React.Component {
     super(props);
 
     this.state = {
+      id: "allapk",
       assetSearchTicker: "",
-      assetsToPotentiallyAdd: []
+      assetsToPotentiallyAdd: [],
+      portfolioAssets: [],
     };
 
     this.submitAssetSearch = this.submitAssetSearch.bind(this);
     this.addStockToTicker = this.addStockWithTicker.bind(this);
   };
+
+  componentDidMount() {
+    this.getPortfolioAssets();
+  }
+
+  getPortfolioAssets() {
+    fetch("http://localhost:8081/getPortfolio/" + this.state.id,
+      {
+        method: 'GET' // The type of HTTP request.
+      }).then(res => {
+        return res.json()
+      }, err => {
+        console.log(err)
+      }).then(assetsData => {
+        console.log(assetsData)
+        this.setState({
+          portfolioAssets: assetsData.assets,
+        });
+      }, err => {
+        console.log(err);
+      });
+  }
 
   submitAssetSearch(e) {
     const ticker = document.getElementById('tickerInput').value.toUpperCase();
@@ -43,6 +67,19 @@ export default class Portfolio extends React.Component {
   addStockWithTicker(ticker) {
     //TODO: add stock to portfolio
     console.log("add stock with ticker: " + ticker)
+    fetch("http://localhost:8081/addPortfolio/" + this.state.id + "/" + this.state.id + "/" +ticker + "/" + 1,
+      {
+        method: 'GET' // The type of HTTP request.
+      }).then(res => {
+        return res.json()
+      }, err => {
+        console.log(err);
+      }).then(assetsData => {
+        console.log(assetsData)
+      }, err => {
+        console.log(err);
+      });
+    this.getPortfolioAssets();
   }
 
   render() {
@@ -60,7 +97,33 @@ export default class Portfolio extends React.Component {
 
         <br />
 
+        <div className="container movies-container">
+          <table class="table table-hover">
+            <thead>
+              <tr>
+                <th scope="col">Ticker</th>
+                <th scope="col">Volume</th>
+                <th scope="col">Price</th>
+                <th scope="col">Value</th>
+              </tr>
+            </thead>
+            <tbody>
+              {
+                this.state.portfolioAssets.map((assetData,i) =>(
+                  <tr key={i}>
+                    <th scope="row">{assetData[1]}</th>
+                    <td>{assetData[2]}</td>
+                    <td>{assetData[3]}</td>
+                    <td>{assetData[4]}</td>
+                  </tr>
+                ))
+              }
+            </tbody>
+          </table>
+        </div>
         
+        <br />
+        <br />
 
         <div className="container d-flex justify-content-center" >
         <h3>

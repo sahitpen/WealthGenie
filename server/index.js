@@ -30,6 +30,12 @@ app.get('/stock/:ticker/:startDate/:endDate', routes.getStockData);
 /* ---- (Portfolio Search) ---- */
 app.get('/portfolio/:ticker', routes.getAssetTickers);
 
+/* ---- (Get Portfolio) ---- */
+app.get('/getPortfolio/:id', routes.getPortfolio);
+
+/* ---- (Add Portfolio) ---- */
+app.get('/addPortfolio/:name/:id/:ticker/:count', routes.addAssetToPortfolio);
+
 /* ---- Q2 (Recommendations) ---- */
 app.get('/recommendations/:movieName', routes.getRecs);
 

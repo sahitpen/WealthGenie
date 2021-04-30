@@ -188,6 +188,48 @@ async function getAssetTickers(req, res) {
   }
 };
 
+async function getPortfolio(req, res) {
+  await init()
+  var id = req.params.id;
+  const query = `
+    WITH LatestQuotes AS (
+      SELECT asset_ticker, Close
+      FROM StockQuote 
+      WHERE Date_Calendar=(SELECT max(Date_Calendar) FROM StockQuote)
+    )
+    SELECT name, stock_ticker, stock_count, close, stock_count * close AS value
+    FROM Portfolio p JOIN Client u ON p.client_uid = u.client_uid 
+    JOIN Portfolio_Has_Stock phs ON p.name = phs.portfolio_name
+    JOIN LatestQuotes lq ON lq.asset_ticker = phs.stock_ticker;
+  `
+  try {
+    const assetsResult = await connection.execute(query);
+    res.json({
+      "assets": assetsResult.rows
+    });
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+// not working yet, have to change
+async function addAssetToPortfolio(req, res) {
+  await init()
+  var name = req.params.name;
+  var id = req.params.name;
+  var ticker = req.params.name;
+  var count = req.params.name;
+  const query = `
+    INSERT INTO Portfolio_Has_Stock (portfolio_name, client_uid, stock_ticker, stock_count)
+    VALUES ('${name}', '${id}', '${ticker}', ${count});
+  `
+  try {
+    const assetsResult = await connection.execute(query);
+  } catch (err) {
+    console.log(err);
+  }
+}
+
 
 
 
@@ -332,4 +374,6 @@ module.exports = {
   getStockData: getStockData,
   getCryptoData: getCryptoData,
   getAssetTickers: getAssetTickers,
+  getPortfolio: getPortfolio,
+  addAssetToPortfolio: addAssetToPortfolio
 };
