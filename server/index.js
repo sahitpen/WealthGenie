@@ -33,8 +33,11 @@ app.get('/portfolio/:ticker', routes.getAssetTickers);
 /* ---- (Get Portfolio) ---- */
 app.get('/getPortfolio/:id', routes.getPortfolio);
 
-/* ---- (Add Portfolio) ---- */
-app.get('/addPortfolio/:name/:id/:ticker/:count', routes.addAssetToPortfolio);
+/* ---- (Add to Portfolio) ---- */
+app.get('/addPortfolio/:id/:ticker/:count', routes.addAssetToPortfolio);
+
+/* ---- (Add to Portfolio) ---- */
+app.get('/removePortfolio/:id/:ticker', routes.removeAssetFromPortfolio);
 
 /* ---- Q2 (Recommendations) ---- */
 app.get('/recommendations/:movieName', routes.getRecs);

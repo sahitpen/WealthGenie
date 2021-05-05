@@ -1,6 +1,7 @@
 const config = require('./db-config.js');
 const mysql = require('mysql');
 const oracle = require('oracledb');
+oracle.autoCommit = true;
 
 var connection = null;
 
@@ -165,7 +166,6 @@ async function getAssetTickers(req, res) {
   //given a partial/full ticker, this route returns a list of tickers that start with the given query ticker
   await init()
   var ticker = req.params.ticker;
-  console.log(ticker);
   const assetQuery = `
     WITH quote AS (
       (SELECT * FROM stock)
@@ -190,19 +190,19 @@ async function getAssetTickers(req, res) {
 async function getPortfolio(req, res) {
   await init()
   var id = req.params.id;
-  const query = `
+  const assetQuery = `
     WITH LatestQuotes AS (
       SELECT asset_ticker, Close
       FROM StockQuote 
-      WHERE Date_Calendar=(SELECT max(Date_Calendar) FROM StockQuote)
+      WHERE Date_Calendar=(SELECT MAX(Date_Calendar) FROM StockQuote)
     )
-    SELECT name, stock_ticker, stock_count, close, stock_count * close AS value
-    FROM Portfolio p JOIN Client u ON p.client_uid = u.client_uid 
-    JOIN Portfolio_Has_Stock phs ON p.name = phs.portfolio_name
-    JOIN LatestQuotes lq ON lq.asset_ticker = phs.stock_ticker;
-  `
+    SELECT stock_ticker, stock_count, close, stock_count * close AS value
+    FROM Client u JOIN Portfolio_Has_Stock phs ON u.client_uid = phs.client_uid
+    JOIN LatestQuotes lq ON lq.asset_ticker = phs.stock_ticker
+    WHERE u.client_uid='${id}'
+  `;
   try {
-    const assetsResult = await connection.execute(query);
+    const assetsResult = await connection.execute(assetQuery);
     res.json({
       "assets": assetsResult.rows
     });
@@ -211,19 +211,38 @@ async function getPortfolio(req, res) {
   }
 }
 
-// not working yet, have to change
 async function addAssetToPortfolio(req, res) {
   await init()
-  var name = req.params.name;
-  var id = req.params.name;
-  var ticker = req.params.name;
-  var count = req.params.name;
+  var id = req.params.id;
+  var ticker = req.params.ticker;
+  var count = req.params.count;
   const query = `
-    INSERT INTO Portfolio_Has_Stock (portfolio_name, client_uid, stock_ticker, stock_count)
-    VALUES ('${name}', '${id}', '${ticker}', ${count});
+    INSERT INTO Portfolio_Has_Stock (client_uid, stock_ticker, stock_count) 
+    VALUES ('${id}', '${ticker}', ${count})
   `
   try {
-    const assetsResult = await connection.execute(query);
+    const result = await connection.execute(query);
+    res.json({
+      "assets": result.rows
+    });
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+async function removeAssetFromPortfolio(req, res) {
+  await init()
+  var id = req.params.id;
+  var ticker = req.params.ticker;
+
+  const query = `
+    DELETE FROM Portfolio_Has_Stock WHERE client_uid='${id}' AND stock_ticker='${ticker}'
+  `
+  try {
+    const result = await connection.execute(query);
+    res.json({
+      "assets": result.rows
+    });
   } catch (err) {
     console.log(err);
   }
@@ -374,5 +393,6 @@ module.exports = {
   getCryptoData: getCryptoData,
   getAssetTickers: getAssetTickers,
   getPortfolio: getPortfolio,
-  addAssetToPortfolio: addAssetToPortfolio
+  addAssetToPortfolio: addAssetToPortfolio,
+  removeAssetFromPortfolio: removeAssetFromPortfolio
 };

@@ -65,9 +65,7 @@ export default class Portfolio extends React.Component {
   };
 
   addStockWithTicker(ticker) {
-    //TODO: add stock to portfolio
-    console.log("add stock with ticker: " + ticker)
-    fetch("http://localhost:8081/addPortfolio/" + this.state.id + "/" + this.state.id + "/" +ticker + "/" + 1,
+    fetch("http://localhost:8081/addPortfolio/" + this.state.id + "/" + ticker + "/" + 1,
       {
         method: 'GET' // The type of HTTP request.
       }).then(res => {
@@ -76,10 +74,26 @@ export default class Portfolio extends React.Component {
         console.log(err);
       }).then(assetsData => {
         console.log(assetsData)
+        this.getPortfolioAssets();
       }, err => {
         console.log(err);
       });
-    this.getPortfolioAssets();
+  }
+
+  removeStockWithTicker(ticker) {
+    fetch("http://localhost:8081/removePortfolio/" + this.state.id + "/" + ticker,
+    {
+      method: 'GET' // The type of HTTP request.
+    }).then(res => {
+      return res.json()
+    }, err => {
+      console.log(err);
+    }).then(assetsData => {
+      console.log(assetsData)
+      this.getPortfolioAssets();
+    }, err => {
+      console.log(err);
+    });
   }
 
   render() {
@@ -98,23 +112,25 @@ export default class Portfolio extends React.Component {
         <br />
 
         <div className="container movies-container">
-          <table class="table table-hover">
+          <table className="table table-hover">
             <thead>
               <tr>
                 <th scope="col">Ticker</th>
-                <th scope="col">Volume</th>
                 <th scope="col">Price</th>
+                <th scope="col">Quantity</th>
                 <th scope="col">Value</th>
+                <th scope="col"></th>
               </tr>
             </thead>
             <tbody>
               {
                 this.state.portfolioAssets.map((assetData,i) =>(
                   <tr key={i}>
-                    <th scope="row">{assetData[1]}</th>
+                    <th scope="row">{assetData[0]}</th>
                     <td>{assetData[2]}</td>
+                    <td>{assetData[1]}</td>
                     <td>{assetData[3]}</td>
-                    <td>{assetData[4]}</td>
+                    <td><button className="btn btn-danger my-2 my-sm-0" onClick={()=>this.removeStockWithTicker(assetData[0])} >Remove</button></td>
                   </tr>
                 ))
               }
@@ -130,9 +146,9 @@ export default class Portfolio extends React.Component {
             Add Asset&nbsp;
             <small className="text-muted">to Portfolio:&nbsp;</small>
           </h3> 
-          <form class="form-inline my-2 my-lg-0">
-            <div class="input-group mb-3">
-              <input type="text" id="tickerInput" class="form-control" placeholder="Ticker" aria-label="Ticker" onChange={this.submitAssetSearch}/>
+          <form className="form-inline my-2 my-lg-0">
+            <div className="input-group mb-3">
+              <input type="text" id="tickerInput" className="form-control" placeholder="Ticker" aria-label="Ticker" onChange={this.submitAssetSearch}/>
             </div>
           </form>
         </div>
@@ -140,7 +156,7 @@ export default class Portfolio extends React.Component {
         <br />
 
         <div className="container movies-container">
-          <table class="table table-hover">
+          <table className="table table-hover">
             <thead>
               <tr>
                 <th scope="col">Ticker</th>
@@ -156,7 +172,7 @@ export default class Portfolio extends React.Component {
                     <th scope="row">{assetData[0]}</th>
                     <td>{assetData[1]}</td>
                     <td>{assetData[2]}</td>
-                    <td><button class="btn btn-success my-2 my-sm-0" onClick={()=>this.addStockWithTicker(assetData[0])} >Add</button></td>
+                    <td><button className="btn btn-success my-2 my-sm-0" onClick={()=>this.addStockWithTicker(assetData[0])} >Add</button></td>
                   </tr>
                 ))
               }
