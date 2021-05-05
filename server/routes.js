@@ -236,7 +236,28 @@ async function removeAssetFromPortfolio(req, res) {
   var ticker = req.params.ticker;
 
   const query = `
-    DELETE FROM Portfolio_Has_Stock WHERE client_uid='${id}' AND stock_ticker='${ticker}'
+    DELETE FROM Portfolio_Has_Stock 
+    WHERE client_uid='${id}' AND stock_ticker='${ticker}'
+  `
+  try {
+    const result = await connection.execute(query);
+    res.json({
+      "assets": result.rows
+    });
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+async function updateAssetQuantity(req, res) {
+  await init()
+  var id = req.params.id;
+  var ticker = req.params.ticker;
+  var count = req.params.count;
+
+  const query = `
+    UPDATE Portfolio_Has_STOCK SET stock_count=${count}
+    WHERE client_uid='${id}' AND stock_ticker='${ticker}'
   `
   try {
     const result = await connection.execute(query);
@@ -394,5 +415,6 @@ module.exports = {
   getAssetTickers: getAssetTickers,
   getPortfolio: getPortfolio,
   addAssetToPortfolio: addAssetToPortfolio,
-  removeAssetFromPortfolio: removeAssetFromPortfolio
+  removeAssetFromPortfolio: removeAssetFromPortfolio,
+  updateAssetQuantity: updateAssetQuantity
 };

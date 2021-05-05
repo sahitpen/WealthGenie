@@ -2,6 +2,7 @@ import React from 'react';
 import '../style/Dashboard.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import PageNavbar from './PageNavbar';
+import { BsCheck } from "react-icons/bs";
 
 export default class Portfolio extends React.Component {
   constructor(props) {
@@ -12,6 +13,7 @@ export default class Portfolio extends React.Component {
       assetSearchTicker: "",
       assetsToPotentiallyAdd: [],
       portfolioAssets: [],
+      assetQuantities: []
     };
 
     this.submitAssetSearch = this.submitAssetSearch.bind(this);
@@ -73,7 +75,6 @@ export default class Portfolio extends React.Component {
       }, err => {
         console.log(err);
       }).then(assetsData => {
-        console.log(assetsData)
         this.getPortfolioAssets();
       }, err => {
         console.log(err);
@@ -89,12 +90,36 @@ export default class Portfolio extends React.Component {
     }, err => {
       console.log(err);
     }).then(assetsData => {
-      console.log(assetsData)
       this.getPortfolioAssets();
     }, err => {
       console.log(err);
     });
   }
+
+  updateStockQuantity(ticker, index) {
+    var count = this.state.portfolioAssets[index][1]
+    fetch("http://localhost:8081/updatePortfolio/" + this.state.id + "/" + ticker + "/" + count,
+    {
+      method: 'GET' // The type of HTTP request.
+    }).then(res => {
+      return res.json()
+    }, err => {
+      console.log(err);
+    }).then(assetsData => {
+      this.getPortfolioAssets();
+    }, err => {
+      console.log(err);
+    });
+  }
+
+  handleQuantityChange(i, value) {
+    var portfolio = this.state.portfolioAssets;
+    portfolio[i][1] = value;
+    this.setState({
+      portfolioAssets: portfolio
+    })
+  }
+
 
   render() {
     return (
@@ -128,7 +153,14 @@ export default class Portfolio extends React.Component {
                   <tr key={i}>
                     <th scope="row">{assetData[0]}</th>
                     <td>{assetData[2]}</td>
-                    <td>{assetData[1]}</td>
+                    <td>
+                      <div className="quantityDiv">
+                        <input className="assetQuantity form-control" type="text" placeholder="" value={assetData[1]} onChange={e=>this.handleQuantityChange(i, e.target.value)}></input>
+                        <div className="input-group-append">
+                          <button className="btn btn-success" type="button" onClick={()=>this.updateStockQuantity(assetData[0], i)}><BsCheck /></button>
+                        </div>
+                      </div>
+                    </td>
                     <td>{assetData[3]}</td>
                     <td><button className="btn btn-danger my-2 my-sm-0" onClick={()=>this.removeStockWithTicker(assetData[0])} >Remove</button></td>
                   </tr>
