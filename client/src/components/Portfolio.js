@@ -127,13 +127,12 @@ export default class Portfolio extends React.Component {
 
         <div className="container d-flex justify-content-center" >
         <h3>
-            Add Asset &nbsp;
-            <small className="text-muted">to Portfolio: </small>
+            Add Asset&nbsp;
+            <small className="text-muted">to Portfolio:&nbsp;</small>
           </h3> 
           <form class="form-inline my-2 my-lg-0">
             <div class="input-group mb-3">
-              <input type="text" id="tickerInput" class="form-control" placeholder="Ticker" aria-label="Ticker" />
-              <button class="form-control btn btn-outline-success my-2 my-sm-0" onClick={this.submitAssetSearch}>Search</button>
+              <input type="text" id="tickerInput" class="form-control" placeholder="Ticker" aria-label="Ticker" onChange={this.submitAssetSearch}/>
             </div>
           </form>
         </div>

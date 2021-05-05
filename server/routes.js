@@ -176,10 +176,9 @@ async function getAssetTickers(req, res) {
     FROM quote
     WHERE ticker LIKE '${ticker}%'
   `;
-  console.log(assetQuery);
   try {
     const assetsResult = await connection.execute(assetQuery);
-    console.log(assetsResult.rows);
+    //console.log(assetsResult.rows);
     res.json({
       "assets": assetsResult.rows
     });
