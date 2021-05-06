@@ -101,6 +101,7 @@ export default class Dashboard extends React.Component {
   }
 
   submitDefaultStockSearch(e) {
+    console.log(e.target.value)
     this.submitStockSearch(e.target.value, "2/8/2013", "2/7/2018");
     window.scrollTo(0, 0);
   }
