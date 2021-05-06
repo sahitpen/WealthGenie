@@ -32,12 +32,12 @@ async function getTop20Keywords(req, res) {
   }
 };
 
-/* ---- Crypto Search ---- */ 
+/* ---- Crypto Search ---- */
 async function getCryptoData(req, res) {
   await init()
-  var ticker = req.params.ticker; 
-  var startDate = req.params.startDate; 
-  var endDate = req.params.endDate; 
+  var ticker = req.params.ticker;
+  var startDate = req.params.startDate;
+  var endDate = req.params.endDate;
 
   /*
    *queries to be implemented 
@@ -82,17 +82,21 @@ async function getStockData(req, res) {
         FROM StockQuote
         WHERE ASSET_TICKER = '${ticker}'
     ), EarliestQuotes AS (
-        SELECT * FROM TickerQuotes 
-        WHERE DATE_CALENDAR = (CASE 
-            WHEN (SELECT MIN(DATE_CALENDAR) FROM TickerQuotes) <= TO_DATE('${startDate}') THEN TO_DATE('${startDate}')
-            ELSE (SELECT MIN(DATE_CALENDAR) FROM TickerQuotes)
-        END)
+        SELECT * FROM TickerQuotes tq
+        WHERE DATE_CALENDAR = (
+          SELECT MIN(sq.date_calendar)
+          FROM StockQuote sq
+          WHERE sq.asset_ticker=tq.asset_ticker
+          AND sq.date_calendar >= TO_DATE('${startDate}', 'YYYY-MM-DD')
+        )
     ), LatestQuotes AS (
-        SELECT * FROM TickerQuotes 
-        WHERE DATE_CALENDAR = (CASE 
-            WHEN (SELECT MAX(DATE_CALENDAR) FROM TickerQuotes) >= TO_DATE('${endDate}') THEN TO_DATE('${endDate}')
-            ELSE (SELECT MAX(DATE_CALENDAR) FROM TickerQuotes)
-        END)
+        SELECT * FROM TickerQuotes tq
+        WHERE DATE_CALENDAR = (
+          SELECT MAX(sq.date_calendar)
+          FROM StockQuote sq
+          WHERE sq.asset_ticker=tq.asset_ticker
+          AND sq.date_calendar <= TO_DATE('${endDate}', 'YYYY-MM-DD')
+       ) 
     )
     SELECT eq.close as startingPrice, lq.close AS endingPrice, ROUND(((lq.close - eq.close) / eq.close * 100), 2) as percent_growth 
     FROM LatestQuotes lq 
@@ -102,7 +106,7 @@ async function getStockData(req, res) {
     WITH TickerQuotes AS (
         SELECT ASSET_TICKER, DATE_CALENDAR, HIGH, LOW  
         FROM StockQuote
-        WHERE ASSET_TICKER = '${ticker}' AND  DATE_CALENDAR >= TO_DATE('${startDate}') AND DATE_CALENDAR <= TO_DATE('${endDate}')
+        WHERE ASSET_TICKER = '${ticker}' AND  DATE_CALENDAR >= TO_DATE('${startDate}', 'YYYY-MM-DD') AND DATE_CALENDAR <= TO_DATE('${endDate}', 'YYYY-MM-DD')
     ), HighQuotes AS (
         SELECT ASSET_TICKER, DATE_CALENDAR, HIGH FROM TickerQuotes 
         ORDER BY HIGH DESC FETCH FIRST 1 ROWS ONLY
@@ -118,7 +122,7 @@ async function getStockData(req, res) {
     WITH TickerQuotes AS (
         SELECT ASSET_TICKER, DATE_CALENDAR, VOLUME
         FROM StockQuote
-        WHERE ASSET_TICKER = '${ticker}' AND  DATE_CALENDAR >= TO_DATE('${startDate}') AND DATE_CALENDAR <= TO_DATE('${endDate}')
+        WHERE ASSET_TICKER = '${ticker}' AND  DATE_CALENDAR >= TO_DATE('${startDate}', 'YYYY-MM-DD') AND DATE_CALENDAR <= TO_DATE('${endDate}', 'YYYY-MM-DD')
     ), HighVolume AS (
         SELECT ASSET_TICKER, DATE_CALENDAR as highVolumeDate, VOLUME FROM TickerQuotes 
         ORDER BY VOLUME DESC FETCH FIRST 1 ROWS ONLY
@@ -136,9 +140,41 @@ async function getStockData(req, res) {
   `
   const changeQuery = `
     SELECT DATE_CALENDAR, OPEN, CLOSE, ROUND(((CLOSE-OPEN)/OPEN * 100), 2) AS PERCENTCHANGE 
-    FROM STOCKQUOTE
-    WHERE ASSET_TICKER = '${ticker}' AND  DATE_CALENDAR >= TO_DATE('${startDate}') AND DATE_CALENDAR <= TO_DATE('${endDate}')
+    FROM StockQuote
+    WHERE ASSET_TICKER = '${ticker}' AND  DATE_CALENDAR >= TO_DATE('${startDate}', 'YYYY-MM-DD') AND DATE_CALENDAR <= TO_DATE('${endDate}', 'YYYY-MM-DD')
     ORDER BY ABS(PERCENTCHANGE) DESC FETCH FIRST 1 ROWS ONLY
+  `
+  const similarCompaniesQuery = `
+    WITH firstQuotes AS (
+        SELECT sq1.date_calendar, sq1.asset_ticker, sq1.close
+        FROM StockQuote sq1
+        WHERE sq1.date_calendar = (
+            SELECT MIN(sq2.date_calendar)
+            FROM StockQuote sq2
+            WHERE sq2.asset_ticker=sq1.asset_ticker
+            AND sq2.date_calendar >= TO_DATE('${startDate}', 'YYYY-MM-DD')
+        )
+    ), lastQuotes AS (
+        SELECT sq1.date_calendar, sq1.asset_ticker, sq1.close
+        FROM StockQuote sq1
+        WHERE sq1.date_calendar = (
+            SELECT MAX(sq2.date_calendar)
+            FROM StockQuote sq2
+            WHERE sq2.asset_ticker=sq1.asset_ticker
+            AND sq2.date_calendar <= TO_DATE('${endDate}', 'YYYY-MM-DD')
+        )
+    ), returns AS (
+        SELECT fq.asset_ticker, 100*((lq.close - fq.close)/fq.close) as percentage_growth
+        FROM firstQuotes fq
+        JOIN lastQuotes lq ON fq.asset_ticker=lq.asset_ticker
+    ), comparisons AS (
+        SELECT ASSET_TICKER, PERCENTAGE_GROWTH, 
+        ABS((SELECT PERCENTAGE_GROWTH FROM returns WHERE ASSET_TICKER='${ticker}')-PERCENTAGE_GROWTH) as DIFFERENCE 
+        FROM returns
+    ) SELECT ASSET_TICKER, NAME, PERCENTAGE_GROWTH 
+    FROM comparisons c JOIN Stock s ON c.ASSET_TICKER = s.TICKER
+    WHERE ASSET_TICKER <> '${ticker}' ORDER BY DIFFERENCE
+    FETCH FIRST 10 ROWS ONLY
   `
   try {
     const growthResult = await connection.execute(growthQuery);
@@ -149,16 +185,142 @@ async function getStockData(req, res) {
     console.log(volumeResult.rows);
     const changeResult = await connection.execute(changeQuery);
     console.log(changeResult.rows);
+    const similarCompaniesResult = await connection.execute(similarCompaniesQuery);
+    console.log(similarCompaniesResult.rows);
     res.json({
       "growthResult": growthResult.rows,
       "priceResult": priceResult.rows,
       "volumeResult": volumeResult.rows,
-      "changeResult": changeResult.rows
+      "changeResult": changeResult.rows,
+      "similarCompaniesResult": similarCompaniesResult.rows
     });
   } catch (err) {
     console.log(err);
   }
 };
+
+async function getIndustryData(req, res) {
+  await init()
+  var industry = req.params.industry;
+  var startDate = req.params.startDate;
+  var endDate = req.params.endDate;
+  console.log(industry);
+  console.log(startDate);
+  console.log(endDate);
+  const growthQuery = `
+    WITH TickerQuotes AS (
+        SELECT ASSET_TICKER, DATE_CALENDAR, CLOSE 
+        FROM StockQuote sq
+        JOIN Stock s ON sq.ASSET_TICKER = s.TICKER
+        WHERE s.INDUSTRY = '${industry}'
+    ), EarliestQuotes AS (
+        SELECT * FROM TickerQuotes tq
+        WHERE DATE_CALENDAR = (
+          SELECT MIN(sq.date_calendar)
+          FROM StockQuote sq
+          WHERE sq.asset_ticker=tq.asset_ticker
+          AND sq.date_calendar >= TO_DATE('${startDate}', 'YYYY-MM-DD')
+        )
+    ), LatestQuotes AS (
+        SELECT * FROM TickerQuotes tq
+        WHERE DATE_CALENDAR = (
+          SELECT MAX(sq.date_calendar)
+          FROM StockQuote sq
+          WHERE sq.asset_ticker=tq.asset_ticker
+          AND sq.date_calendar <= TO_DATE('${endDate}', 'YYYY-MM-DD')
+       ) 
+    ), GrowthRates AS (
+        SELECT eq.ASSET_TICKER as ticker, eq.close as startingPrice, lq.close AS endingPrice, ROUND(((lq.close - eq.close) / eq.close * 100), 2) as percent_growth 
+        FROM LatestQuotes lq 
+        JOIN EarliestQuotes eq ON lq.asset_ticker = eq.asset_ticker
+    ) SELECT COUNT(TICKER) as numStocks, ROUND(AVG(PERCENT_GROWTH), 2) as industryGrowth FROM GrowthRates
+  `
+  const topIndustryStocksQuery = `
+    WITH TickerQuotes AS (
+        SELECT ASSET_TICKER, DATE_CALENDAR, CLOSE 
+        FROM StockQuote sq
+        JOIN Stock s ON sq.ASSET_TICKER = s.TICKER
+        WHERE s.INDUSTRY = '${industry}'
+    ), EarliestQuotes AS (
+        SELECT * FROM TickerQuotes tq
+        WHERE DATE_CALENDAR = (
+          SELECT MIN(sq.date_calendar)
+          FROM StockQuote sq
+          WHERE sq.asset_ticker=tq.asset_ticker
+          AND sq.date_calendar >= TO_DATE('${startDate}', 'YYYY-MM-DD')
+        )
+    ), LatestQuotes AS (
+        SELECT * FROM TickerQuotes tq
+        WHERE DATE_CALENDAR = (
+          SELECT MAX(sq.date_calendar)
+          FROM StockQuote sq
+          WHERE sq.asset_ticker=tq.asset_ticker
+          AND sq.date_calendar <= TO_DATE('${endDate}', 'YYYY-MM-DD')
+       ) 
+    ), GrowthRates AS (
+        SELECT eq.ASSET_TICKER as ticker, eq.close as startingPrice, lq.close AS endingPrice, ROUND(((lq.close - eq.close) / eq.close * 100), 2) as percent_growth 
+        FROM LatestQuotes lq 
+        JOIN EarliestQuotes eq ON lq.asset_ticker = eq.asset_ticker
+    ) SELECT ticker, ROUND(percent_growth, 2) FROM GrowthRates ORDER BY percent_growth DESC FETCH FIRST 5 ROWS ONLY
+  `
+  const worstIndustryStocksQuery = `
+      WITH TickerQuotes AS (
+        SELECT ASSET_TICKER, DATE_CALENDAR, CLOSE 
+        FROM StockQuote sq
+        JOIN Stock s ON sq.ASSET_TICKER = s.TICKER
+        WHERE s.INDUSTRY = '${industry}'
+    ), EarliestQuotes AS (
+        SELECT * FROM TickerQuotes tq
+        WHERE DATE_CALENDAR = (
+          SELECT MIN(sq.date_calendar)
+          FROM StockQuote sq
+          WHERE sq.asset_ticker=tq.asset_ticker
+          AND sq.date_calendar >= TO_DATE('${startDate}', 'YYYY-MM-DD')
+        )
+    ), LatestQuotes AS (
+        SELECT * FROM TickerQuotes tq
+        WHERE DATE_CALENDAR = (
+          SELECT MAX(sq.date_calendar)
+          FROM StockQuote sq
+          WHERE sq.asset_ticker=tq.asset_ticker
+          AND sq.date_calendar <= TO_DATE('${endDate}', 'YYYY-MM-DD')
+       ) 
+    ), GrowthRates AS (
+        SELECT eq.ASSET_TICKER as ticker, eq.close as startingPrice, lq.close AS endingPrice, ROUND(((lq.close - eq.close) / eq.close * 100), 2) as percent_growth 
+        FROM LatestQuotes lq 
+        JOIN EarliestQuotes eq ON lq.asset_ticker = eq.asset_ticker
+    ) SELECT ticker, ROUND(percent_growth, 2) FROM GrowthRates ORDER BY percent_growth FETCH FIRST 5 ROWS ONLY
+  `
+  try {
+    const growthResult = await connection.execute(growthQuery);
+    console.log(growthResult.rows);
+    const topStocksResult = await connection.execute(topIndustryStocksQuery);
+    console.log(topStocksResult.rows);
+    const worstStocksResult = await connection.execute(worstIndustryStocksQuery);
+    console.log(worstStocksResult.rows);
+    res.json({
+      "growthResult": growthResult.rows,
+      "topStocksResult": topStocksResult.rows,
+      "worstStocksResult": worstStocksResult.rows
+    });
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+async function getIndustryNames(req, res) {
+  await init()
+  const namesQuery = `SELECT DISTINCT industry FROM Stock`;
+  try {
+    const namesResult = await connection.execute(namesQuery);
+    console.log(namesResult.rows);
+    res.json({
+      "namesResult": namesResult.rows,
+    });
+  } catch (err) {
+    console.log(err);
+  }
+}
 
 /* ---- Portfolio ---- */
 
@@ -411,6 +573,8 @@ module.exports = {
   getGenres: getGenres,
   bestMoviesPerDecadeGenre: bestMoviesPerDecadeGenre,
   getStockData: getStockData,
+  getIndustryData: getIndustryData,
+  getIndustryNames: getIndustryNames,
   getCryptoData: getCryptoData,
   getAssetTickers: getAssetTickers,
   getPortfolio: getPortfolio,

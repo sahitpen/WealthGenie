@@ -16,16 +16,18 @@ app.use(bodyParser.urlencoded({ extended: false }));
 /* ---- (Dashboard) ---- */
 // The route localhost:8081/keywords is registered to the function
 // routes.getTop20Keywords, specified in routes.js.
-app.get('/stock', routes.getTop20Keywords);
 
 app.get('/crypto/:ticker/:startDate/:endDate', routes.getCryptoData);
-
 
 /* ---- Q1b (Dashboard) ---- */
 app.get('/keywords/:keyword', routes.getTopMoviesWithKeyword);
 
 /* ---- (Stock Search) ---- */
 app.get('/stock/:ticker/:startDate/:endDate', routes.getStockData);
+
+/* ---- (Industry Search) ---- */
+app.get('/industry', routes.getIndustryNames);
+app.get('/industry/:industry/:startDate/:endDate', routes.getIndustryData);
 
 /* ---- (Portfolio Search) ---- */
 app.get('/portfolio/:ticker', routes.getAssetTickers);

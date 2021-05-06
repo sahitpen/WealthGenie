@@ -122,7 +122,7 @@ export default class Cryptocurrency extends React.Component {
         <br />
 
         <div className="container d-flex justify-content-center" >
-          <h3> Historical Data for <span style={{ color: '#73DA8C' }}>Bitcoin</span> 
+          <h3> Historical Data for <span style={{ color: '#73DA8C' }}>Bitcoin</span>
           </h3>
         </div>
 
