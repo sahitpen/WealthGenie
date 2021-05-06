@@ -2,8 +2,6 @@ import React from 'react';
 import '../style/Dashboard.css';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import PageNavbar from './PageNavbar';
-import KeywordButton from './KeywordButton';
-import DashboardMovieRow from './DashboardMovieRow';
 import moment from 'moment';
 
 export default class Dashboard extends React.Component {
@@ -38,7 +36,7 @@ export default class Dashboard extends React.Component {
       topIndustryStocks: [],
       worstIndustryStocks: [],
       industryOptions: [],
-      similarCompanies: []
+      similarCompanies: [],
     };
 
     this.submitInputStockSearch = this.submitInputStockSearch.bind(this);
@@ -230,15 +228,15 @@ export default class Dashboard extends React.Component {
 
         <PageNavbar active="dashboard" />
 
+        {/* Title Section */}
         <br />
-
         <div className="container d-flex justify-content-center" >
           <h3> Historical Data for <span style={{ color: '#73DA8C' }}>S&P 500</span>  Companies
           </h3>
         </div>
 
+        {/* Stock Search Section */}
         <br />
-
         <div className="container d-flex justify-content-center" >
           <form class="form-inline my-2 my-lg-0">
             <div class="input-group mb-3">
@@ -250,8 +248,8 @@ export default class Dashboard extends React.Component {
           </form>
         </div>
 
+        {/* Stock Cards Section */}
         <br />
-
         <div className="container">
           <div class="card-columns">
             <div class="card text-white bg-success mb-3">
@@ -299,6 +297,7 @@ export default class Dashboard extends React.Component {
           </div>
         </div>
 
+        {/* Similar Companies Section */}
         <div className="container movies-container">
           <h3>
             Companies&nbsp;
@@ -318,15 +317,15 @@ export default class Dashboard extends React.Component {
             </tbody>
           </table>
         </div>
-
         <br />
 
+        {/* Other Companies Section */}
         <div className="container movies-container">
           <h3>
             Other&nbsp;
             <small class="text-muted">popular companies</small>
           </h3>
-          <div class="btn-group" role="group" aria-label="Basic outlined example">
+          <div class="btn-group d-flex justify-content-center" role="group" aria-label="Basic outlined example">
             <button type="button" value="AAPL" onClick={this.submitDefaultStockSearch} class="btn btn-outline-secondary">Apple</button>
             <button type="button" value="AMZN" onClick={this.submitDefaultStockSearch} class="btn btn-outline-secondary">Amazon</button>
             <button type="button" value="FB" onClick={this.submitDefaultStockSearch} class="btn btn-outline-secondary">Facebook</button>
@@ -337,8 +336,8 @@ export default class Dashboard extends React.Component {
           </div>
         </div>
 
+        {/* Industry Search Section */}
         <br />
-
         <div className="container movies-container" >
           <h3>
             Industry&nbsp;
@@ -356,9 +355,8 @@ export default class Dashboard extends React.Component {
           </form>
         </div>
 
+        {/* Industry Cards Section */}
         <br />
-
-
         <div className="container">
           <div class="card-columns">
             <div class="card text-white bg-success mb-3">

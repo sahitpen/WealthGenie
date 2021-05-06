@@ -17,10 +17,8 @@ app.use(bodyParser.urlencoded({ extended: false }));
 // The route localhost:8081/keywords is registered to the function
 // routes.getTop20Keywords, specified in routes.js.
 
+/* ---- (Bitcoin Search) ---- */
 app.get('/crypto/:ticker/:startDate/:endDate', routes.getCryptoData);
-
-/* ---- Q1b (Dashboard) ---- */
-app.get('/keywords/:keyword', routes.getTopMoviesWithKeyword);
 
 /* ---- (Stock Search) ---- */
 app.get('/stock/:ticker/:startDate/:endDate', routes.getStockData);
@@ -43,18 +41,6 @@ app.get('/removePortfolio/:id/:ticker', routes.removeAssetFromPortfolio);
 
 /* ---- (Update Portfolio Quantity) ---- */
 app.get('/updatePortfolio/:id/:ticker/:count', routes.updateAssetQuantity);
-
-/* ---- Q2 (Recommendations) ---- */
-app.get('/recommendations/:movieName', routes.getRecs);
-
-
-/* ---- (Best Movies) ---- */
-app.get('/decades', routes.getDecades);
-app.get('/genres', routes.getGenres);
-
-
-/* ---- Q3b (Best Movies) ---- */
-app.get('/bestmovies/:decade/:genre', routes.bestMoviesPerDecadeGenre);
 
 
 app.listen(8081, () => {
