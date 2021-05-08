@@ -39,13 +39,87 @@ async function getCryptoData(req, res) {
   var startDate = req.params.startDate;
   var endDate = req.params.endDate;
 
+  console.log("start date: " + startDate);
+  console.log("end date: " + endDate);
+
   /*
    *queries to be implemented 
    */
-  const growthQuery = ``;
-  const priceQuery = ``;
-  const volumeQuery = ``;
-  const changeQuery = ``;
+  const growthQuery = `
+  WITH TickerQuotes AS (
+          SELECT ASSET_TICKER, CALENDAR_DATE, CLOSE 
+          FROM CRYPTOQUOTE
+          WHERE ASSET_TICKER = 'BTC'
+      ), EarliestQuotes AS (
+          SELECT * FROM TickerQuotes tq
+          WHERE CALENDAR_DATE = (
+            SELECT MIN(sq.calendar_date)
+            FROM CRYPTOQUOTE sq
+            WHERE sq.asset_ticker=tq.asset_ticker
+            AND sq.calendar_date >= TO_DATE('${startDate}', 'YYYY-MM-DD')
+          )
+      ), LatestQuotes AS (
+          SELECT * FROM TickerQuotes tq
+          WHERE CALENDAR_DATE = (
+            SELECT MAX(sq.calendar_date)
+            FROM CRYPTOQUOTE sq
+            WHERE sq.asset_ticker=tq.asset_ticker
+            AND sq.calendar_date <= TO_DATE('${endDate}', 'YYYY-MM-DD')
+          )
+      )
+      SELECT eq.close as startingPrice, lq.close AS endingPrice, ROUND(((lq.close - eq.close) / eq.close * 100), 2) as percent_growth 
+      FROM LatestQuotes lq 
+      JOIN EarliestQuotes eq ON lq.asset_ticker = eq.asset_ticker
+      `;
+
+  const priceQuery = `
+  WITH TickerQuotes AS (
+        SELECT ASSET_TICKER, DATE_CALENDAR, HIGH, LOW  
+        FROM CRYPTOQUOTE
+        WHERE ASSET_TICKER = 'BTC' AND  DATE_CALENDAR >= TO_DATE('${startDate}', 'YYYY-MM-DD') AND DATE_CALENDAR <= TO_DATE('${endDate}', 'YYYY-MM-DD')
+    ), HighQuotes AS (
+        SELECT ASSET_TICKER, DATE_CALENDAR, HIGH FROM TickerQuotes
+        ORDER BY HIGH DESC FETCH FIRST 1 ROWS ONLY
+    ), LowQuotes AS (
+        SELECT ASSET_TICKER, DATE_CALENDAR, LOW FROM TickerQuotes 
+        ORDER BY LOW FETCH FIRST 1 ROWS ONLY
+    ) 
+    SELECT l.low as LOW, l.DATE_CALENDAR AS lowDate, h.high as HIGH, h.DATE_CALENDAR AS highDate 
+    FROM HighQuotes h 
+    JOIN LowQuotes l ON h.ASSET_TICKER = l.ASSET_TICKER
+    `;
+
+  const volumeQuery = `
+  WITH TickerQuotes AS (
+    SELECT ASSET_TICKER, DATE_CALENDAR, VOLUME
+    FROM CRYPTOQUOTE
+    WHERE ASSET_TICKER = 'BTC' AND  DATE_CALENDAR >= TO_DATE('${startDate}', 'YYYY-MM-DD') AND DATE_CALENDAR <= TO_DATE('${endDate}', 'YYYY-MM-DD')
+), HighVolume AS (
+    SELECT ASSET_TICKER, DATE_CALENDAR as highVolumeDate, VOLUME FROM TickerQuotes 
+    ORDER BY VOLUME DESC FETCH FIRST 1 ROWS ONLY
+), LowVolume AS (
+    SELECT ASSET_TICKER, DATE_CALENDAR as lowVolumeDate, VOLUME FROM TickerQuotes 
+    ORDER BY VOLUME FETCH FIRST 1 ROWS ONLY
+), AverageVolume AS (
+    SELECT ASSET_TICKER, ROUND(AVG(VOLUME), 2) as avgVolume FROM TickerQuotes 
+    GROUP BY ASSET_TICKER
+)
+SELECT l.volume as LOW, lowVolumeDate, h.volume as HIGH, highVolumeDate, a.avgVolume
+FROM HighVolume h 
+JOIN LowVolume l ON h.ASSET_TICKER = l.ASSET_TICKER
+JOIN AverageVolume a ON a.ASSET_TICKER = l.ASSET_TICKER
+`;
+
+
+  const changeQuery = `
+  SELECT DATE_CALENDAR, OPEN, CLOSE, ROUND(((CLOSE-OPEN)/OPEN * 100), 2) AS PERCENTCHANGE 
+  FROM CRYPTOQUOTE
+  WHERE ASSET_TICKER = 'BTC' AND  DATE_CALENDAR >= TO_DATE('${startDate}', 'YYYY-MM-DD') AND DATE_CALENDAR <= TO_DATE('${endDate}', 'YYYY-MM-DD')
+  ORDER BY ABS(PERCENTCHANGE) DESC FETCH FIRST 1 ROWS ONLY
+  `;
+
+  
+
   try {
     const growthResult = await connection.execute(growthQuery);
     console.log(growthResult.rows);
