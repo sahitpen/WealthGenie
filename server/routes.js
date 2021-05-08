@@ -21,18 +21,11 @@ async function init() {
 /* ---- Crypto Search ---- */
 async function getCryptoData(req, res) {
   await init()
-  var ticker = req.params.ticker;
   var startDate = req.params.startDate;
   var endDate = req.params.endDate;
 
-  console.log("start date: " + startDate);
-  console.log("end date: " + endDate);
-
-  /*
-   *queries to be implemented 
-   */
   const growthQuery = `
-  WITH TickerQuotes AS (
+    WITH TickerQuotes AS (
           SELECT ASSET_TICKER, CALENDAR_DATE, CLOSE 
           FROM CRYPTOQUOTE
           WHERE ASSET_TICKER = 'BTC'
@@ -56,55 +49,52 @@ async function getCryptoData(req, res) {
       SELECT eq.close as startingPrice, lq.close AS endingPrice, ROUND(((lq.close - eq.close) / eq.close * 100), 2) as percent_growth 
       FROM LatestQuotes lq 
       JOIN EarliestQuotes eq ON lq.asset_ticker = eq.asset_ticker
-      `;
-
-  const priceQuery = `
-  WITH TickerQuotes AS (
-        SELECT ASSET_TICKER, DATE_CALENDAR, HIGH, LOW  
-        FROM CRYPTOQUOTE
-        WHERE ASSET_TICKER = 'BTC' AND  DATE_CALENDAR >= TO_DATE('${startDate}', 'YYYY-MM-DD') AND DATE_CALENDAR <= TO_DATE('${endDate}', 'YYYY-MM-DD')
-    ), HighQuotes AS (
-        SELECT ASSET_TICKER, DATE_CALENDAR, HIGH FROM TickerQuotes
-        ORDER BY HIGH DESC FETCH FIRST 1 ROWS ONLY
-    ), LowQuotes AS (
-        SELECT ASSET_TICKER, DATE_CALENDAR, LOW FROM TickerQuotes 
-        ORDER BY LOW FETCH FIRST 1 ROWS ONLY
-    ) 
-    SELECT l.low as LOW, l.DATE_CALENDAR AS lowDate, h.high as HIGH, h.DATE_CALENDAR AS highDate 
-    FROM HighQuotes h 
-    JOIN LowQuotes l ON h.ASSET_TICKER = l.ASSET_TICKER
-    `;
-
-  const volumeQuery = `
-  WITH TickerQuotes AS (
-    SELECT ASSET_TICKER, DATE_CALENDAR, VOLUME
-    FROM CRYPTOQUOTE
-    WHERE ASSET_TICKER = 'BTC' AND  DATE_CALENDAR >= TO_DATE('${startDate}', 'YYYY-MM-DD') AND DATE_CALENDAR <= TO_DATE('${endDate}', 'YYYY-MM-DD')
-), HighVolume AS (
-    SELECT ASSET_TICKER, DATE_CALENDAR as highVolumeDate, VOLUME FROM TickerQuotes 
-    ORDER BY VOLUME DESC FETCH FIRST 1 ROWS ONLY
-), LowVolume AS (
-    SELECT ASSET_TICKER, DATE_CALENDAR as lowVolumeDate, VOLUME FROM TickerQuotes 
-    ORDER BY VOLUME FETCH FIRST 1 ROWS ONLY
-), AverageVolume AS (
-    SELECT ASSET_TICKER, ROUND(AVG(VOLUME), 2) as avgVolume FROM TickerQuotes 
-    GROUP BY ASSET_TICKER
-)
-SELECT l.volume as LOW, lowVolumeDate, h.volume as HIGH, highVolumeDate, a.avgVolume
-FROM HighVolume h 
-JOIN LowVolume l ON h.ASSET_TICKER = l.ASSET_TICKER
-JOIN AverageVolume a ON a.ASSET_TICKER = l.ASSET_TICKER
-`;
-
-
-  const changeQuery = `
-  SELECT DATE_CALENDAR, OPEN, CLOSE, ROUND(((CLOSE-OPEN)/OPEN * 100), 2) AS PERCENTCHANGE 
-  FROM CRYPTOQUOTE
-  WHERE ASSET_TICKER = 'BTC' AND  DATE_CALENDAR >= TO_DATE('${startDate}', 'YYYY-MM-DD') AND DATE_CALENDAR <= TO_DATE('${endDate}', 'YYYY-MM-DD')
-  ORDER BY ABS(PERCENTCHANGE) DESC FETCH FIRST 1 ROWS ONLY
   `;
 
-  
+  const priceQuery = `
+    WITH TickerQuotes AS (
+        SELECT ASSET_TICKER, CALENDAR_DATE, HIGH, LOW  
+        FROM CRYPTOQUOTE
+        WHERE ASSET_TICKER = 'BTC' AND  CALENDAR_DATE >= TO_DATE('${startDate}', 'YYYY-MM-DD') AND CALENDAR_DATE <= TO_DATE('${endDate}', 'YYYY-MM-DD')
+    ), HighQuotes AS (
+        SELECT ASSET_TICKER, CALENDAR_DATE, HIGH FROM TickerQuotes
+        ORDER BY HIGH DESC FETCH FIRST 1 ROWS ONLY
+    ), LowQuotes AS (
+        SELECT ASSET_TICKER, CALENDAR_DATE, LOW FROM TickerQuotes 
+        ORDER BY LOW FETCH FIRST 1 ROWS ONLY
+    ) 
+    SELECT l.low as LOW, l.CALENDAR_DATE AS lowDate, h.high as HIGH, h.CALENDAR_DATE AS highDate 
+    FROM HighQuotes h 
+    JOIN LowQuotes l ON h.ASSET_TICKER = l.ASSET_TICKER
+  `;
+
+  const volumeQuery = `
+    WITH TickerQuotes AS (
+        SELECT ASSET_TICKER, CALENDAR_DATE, VOLUME
+        FROM CRYPTOQUOTE
+        WHERE ASSET_TICKER = 'BTC' AND  CALENDAR_DATE >= TO_DATE('${startDate}', 'YYYY-MM-DD') AND CALENDAR_DATE <= TO_DATE('${endDate}', 'YYYY-MM-DD')
+    ), HighVolume AS (
+        SELECT ASSET_TICKER, CALENDAR_DATE as highVolumeDate, VOLUME FROM TickerQuotes 
+        ORDER BY VOLUME DESC FETCH FIRST 1 ROWS ONLY
+    ), LowVolume AS (
+        SELECT ASSET_TICKER, CALENDAR_DATE as lowVolumeDate, VOLUME FROM TickerQuotes 
+        ORDER BY VOLUME FETCH FIRST 1 ROWS ONLY
+    ), AverageVolume AS (
+        SELECT ASSET_TICKER, ROUND(AVG(VOLUME), 2) as avgVolume FROM TickerQuotes 
+        GROUP BY ASSET_TICKER
+    )
+    SELECT l.volume as LOW, lowVolumeDate, h.volume as HIGH, highVolumeDate, a.avgVolume
+    FROM HighVolume h 
+    JOIN LowVolume l ON h.ASSET_TICKER = l.ASSET_TICKER
+    JOIN AverageVolume a ON a.ASSET_TICKER = l.ASSET_TICKER
+  `;
+
+  const changeQuery = `
+    SELECT CALENDAR_DATE, OPEN, CLOSE, ROUND(((CLOSE-OPEN)/OPEN * 100), 2) AS PERCENTCHANGE 
+    FROM CRYPTOQUOTE
+    WHERE ASSET_TICKER = 'BTC' AND  CALENDAR_DATE >= TO_DATE('${startDate}', 'YYYY-MM-DD') AND CALENDAR_DATE <= TO_DATE('${endDate}', 'YYYY-MM-DD')
+    ORDER BY ABS(PERCENTCHANGE) DESC FETCH FIRST 1 ROWS ONLY
+  `;
 
   try {
     const growthResult = await connection.execute(growthQuery);
@@ -119,7 +109,70 @@ JOIN AverageVolume a ON a.ASSET_TICKER = l.ASSET_TICKER
       "growthResult": growthResult.rows,
       "priceResult": priceResult.rows,
       "volumeResult": volumeResult.rows,
-      "changeResult": changeResult.rows
+      "changeResult": changeResult.rows,
+    });
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+async function getCryptoComparisonData(req, res) {
+  await init()
+  var industry = req.params.industry;
+  var startDate = req.params.startDate;
+  var endDate = req.params.endDate;
+
+  const comparisonQuery = `
+    WITH TickerQuotes AS (
+        SELECT *
+        FROM StockQuote sq
+        JOIN Stock s ON sq.ASSET_TICKER = s.TICKER
+        WHERE s.INDUSTRY = '${industry}'
+    ), firstQuotes AS (
+        SELECT sq1.date_calendar, sq1.asset_ticker, sq1.close
+        FROM TickerQuotes sq1
+        WHERE sq1.date_calendar = (
+            SELECT MIN(sq2.date_calendar)
+            FROM TickerQuotes sq2
+            WHERE sq2.asset_ticker=sq1.asset_ticker
+            AND sq2.date_calendar >= TO_DATE('${startDate}', 'YYYY-MM-DD')
+        )
+    ), lastQuotes AS (
+        SELECT sq1.date_calendar, sq1.asset_ticker, sq1.close
+        FROM TickerQuotes sq1
+        WHERE sq1.date_calendar = (
+            SELECT MAX(sq2.date_calendar)
+            FROM TickerQuotes sq2
+            WHERE sq2.asset_ticker=sq1.asset_ticker
+            AND sq2.date_calendar <= TO_DATE('${endDate}', 'YYYY-MM-DD')
+        )
+    ), bitcoin AS (
+        SELECT timestamp, asset_ticker, close
+        FROM CRYPTOQUOTE
+        WHERE asset_ticker='BTC'
+        AND timestamp >= ((TO_DATE('${startDate}', 'YYYY-MM-DD') - TO_DATE('1970-01-01', 'YYYY-MM-DD'))*24*60*60)
+        AND timestamp <= ((TO_DATE('${endDate}', 'YYYY-MM-DD') - TO_DATE('1970-01-01', 'YYYY-MM-DD'))*24*60*60)
+    )
+    SELECT fq.asset_ticker, 100*((lq.close - fq.close)/fq.close) as stock_return, 100*((lq.close - fq.close)/fq.close - (btc2.close-btc1.close)/btc1.close) as difference
+    FROM firstQuotes fq
+    JOIN lastQuotes lq ON fq.asset_ticker = lq.asset_ticker
+    CROSS JOIN (
+        SELECT b1.timestamp, b1.close 
+        FROM bitcoin b1
+        INNER JOIN (SELECT MIN(b3.timestamp) as timestamp FROM bitcoin b3) b2 ON b1.timestamp=b2.timestamp
+    ) btc1
+    CROSS JOIN (
+        SELECT b3.timestamp, b3.close 
+        FROM bitcoin b3
+        INNER JOIN (SELECT MAX(b5.timestamp) as timestamp FROM bitcoin b5) b4 ON b3.timestamp=b4.timestamp
+    ) btc2
+    ORDER BY ABS(difference)
+    `
+  try {
+    const comparisonResult = await connection.execute(comparisonQuery);
+    console.log(comparisonResult);
+    res.json({
+      "comparisonResult": comparisonResult.rows,
     });
   } catch (err) {
     console.log(err);
@@ -504,5 +557,6 @@ module.exports = {
   getPortfolio: getPortfolio,
   addAssetToPortfolio: addAssetToPortfolio,
   removeAssetFromPortfolio: removeAssetFromPortfolio,
-  updateAssetQuantity: updateAssetQuantity
+  updateAssetQuantity: updateAssetQuantity,
+  getCryptoComparisonData: getCryptoComparisonData
 };
