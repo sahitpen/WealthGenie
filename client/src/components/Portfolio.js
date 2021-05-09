@@ -13,7 +13,8 @@ export default class Portfolio extends React.Component {
       assetSearchTicker: "",
       assetsToPotentiallyAdd: [],
       portfolioAssets: [],
-      assetQuantities: []
+      assetQuantities: [],
+      assetsIndividualPercentGrowth: []
     };
 
     this.submitAssetSearch = this.submitAssetSearch.bind(this);
@@ -37,6 +38,22 @@ export default class Portfolio extends React.Component {
         console.log(assetsData)
         this.setState({
           portfolioAssets: assetsData.assets,
+        });
+      }, err => {
+        console.log(err);
+      });
+
+      fetch("http://localhost:8081/getPortfolioPercentGrowth/" + this.state.id + "/individual",
+      {
+        method: 'GET' // The type of HTTP request.
+      }).then(res => {
+        return res.json()
+      }, err => {
+        console.log(err)
+      }).then(assetsData => {
+        console.log(assetsData)
+        this.setState({
+          assetsIndividualPercentGrowth: assetsData.assets,
         });
       }, err => {
         console.log(err);
@@ -207,6 +224,38 @@ export default class Portfolio extends React.Component {
                     <td>{assetData[1]}</td>
                     <td>{assetData[2]}</td>
                     <td><button className="btn btn-success my-2 my-sm-0" onClick={()=>this.addStockWithTicker(assetData[0])} >Add</button></td>
+                  </tr>
+                ))
+              }
+            </tbody>
+          </table>
+        </div>
+
+        <br />
+        <div className="container d-flex justify-content-center" >
+          <h3> Overall Portfolio <span style={{ color: '#73DA8C' }}>Percent Growth</span>
+          </h3>
+        </div>
+
+        <br />
+        <div className="container movies-container">
+          <table className="table table-hover">
+            <thead>
+              <tr>
+                <th scope="col">Ticker</th>
+                <th scope="col">First Close</th>
+                <th scope="col">Last Close</th>
+                <th scope="col">Growth (%)</th>
+              </tr>
+            </thead>
+            <tbody>
+              {
+                this.state.assetsIndividualPercentGrowth.map((assetData,i) =>(
+                  <tr key={i}>
+                    <th scope="row">{assetData[0]}</th>
+                    <td>{assetData[1]}</td>
+                    <td>{assetData[2]}</td>
+                    <td>{assetData[3]}</td>
                   </tr>
                 ))
               }
