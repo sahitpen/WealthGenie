@@ -600,13 +600,13 @@ async function getPortfolioPercentGrowthIndividual(req, res) {
         FROM CryptoQuote cq
         WHERE Calendar_Date=(SELECT min(Calendar_Date) FROM CryptoQuote cq2 WHERE cq.asset_ticker = cq2.asset_ticker)
     )
-    SELECT stock_ticker AS Ticker, lsq.close AS last_close, esq.close as first_close, ((lsq.close - esq.close) / esq.close * 100) as percent_growth
+    SELECT stock_ticker AS Ticker, esq.close as first_close, lsq.close AS last_close, ((lsq.close - esq.close) / esq.close * 100) as percent_growth
     FROM Portfolio_Has_Stock phs
     JOIN LatestStockQuotes lsq ON lsq.asset_ticker = phs.stock_ticker
     JOIN EarliestStockQuotes esq ON esq.asset_ticker = phs.stock_ticker
     WHERE client_uid = '${id}'
     UNION ALL
-    SELECT crypto_ticker AS Ticker, lcq.close AS last_close, ecq.close as first_close, ((lcq.close - ecq.close) / ecq.close * 100) as percent_growth
+    SELECT crypto_ticker AS Ticker, ecq.close as first_close, lcq.close AS last_close, ((lcq.close - ecq.close) / ecq.close * 100) as percent_growth
     FROM Portfolio_Has_Crypto phc
     JOIN LatestCryptoQuotes lcq ON lcq.asset_ticker = phc.crypto_ticker
     JOIN EarliestCryptoQuotes ecq ON ecq.asset_ticker = phc.crypto_ticker
