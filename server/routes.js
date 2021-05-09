@@ -126,8 +126,7 @@ async function getCryptoComparisonData(req, res) {
     WITH TickerQuotes AS (
         SELECT *
         FROM StockQuote sq
-        JOIN Stock s ON sq.ASSET_TICKER = s.TICKER
-        WHERE s.INDUSTRY = '${industry}'
+        JOIN (SELECT * FROM Stock WHERE INDUSTRY = '${industry}') s ON sq.ASSET_TICKER = s.TICKER
     ), firstQuotes AS (
         SELECT sq1.date_calendar, sq1.asset_ticker, sq1.close
         FROM TickerQuotes sq1
@@ -263,18 +262,16 @@ async function getStockData(req, res) {
         FROM StockQuote sq1
         WHERE sq1.date_calendar = (
             SELECT MIN(sq2.date_calendar)
-            FROM StockQuote sq2
+            FROM (SELECT * FROM StockQuote WHERE date_calendar >= TO_DATE('${startDate}', 'YYYY-MM-DD')) sq2
             WHERE sq2.asset_ticker=sq1.asset_ticker
-            AND sq2.date_calendar >= TO_DATE('${startDate}', 'YYYY-MM-DD')
         )
     ), lastQuotes AS (
         SELECT sq1.date_calendar, sq1.asset_ticker, sq1.close
         FROM StockQuote sq1
         WHERE sq1.date_calendar = (
             SELECT MAX(sq2.date_calendar)
-            FROM StockQuote sq2
+            FROM (SELECT * FROM StockQuote WHERE date_calendar <= TO_DATE('${endDate}', 'YYYY-MM-DD')) sq2
             WHERE sq2.asset_ticker=sq1.asset_ticker
-            AND sq2.date_calendar <= TO_DATE('${endDate}', 'YYYY-MM-DD')
         )
     ), returns AS (
         SELECT fq.asset_ticker, 100*((lq.close - fq.close)/fq.close) as percentage_growth
@@ -285,8 +282,8 @@ async function getStockData(req, res) {
         ABS((SELECT PERCENTAGE_GROWTH FROM returns WHERE ASSET_TICKER='${ticker}')-PERCENTAGE_GROWTH) as DIFFERENCE 
         FROM returns
     ) SELECT ASSET_TICKER, NAME, PERCENTAGE_GROWTH 
-    FROM comparisons c JOIN Stock s ON c.ASSET_TICKER = s.TICKER
-    WHERE ASSET_TICKER <> '${ticker}' ORDER BY DIFFERENCE
+    FROM comparisons c JOIN (SELECT * FROM Stock WHERE TICKER <> '${ticker}') s ON c.ASSET_TICKER = s.TICKER
+    ORDER BY DIFFERENCE
     FETCH FIRST 10 ROWS ONLY
   `
   try {
