@@ -470,14 +470,23 @@ async function getPortfolio(req, res) {
   await init()
   var id = req.params.id;
   const assetQuery = `
-    WITH LatestQuotes AS (
+    WITH LatestCryptoQuotes AS (
+      SELECT asset_ticker, Close
+      FROM CryptoQuote 
+      WHERE Calendar_Date=(SELECT MAX(Calendar_Date) FROM CryptoQuote)
+    ), LatestStockQuotes AS (
       SELECT asset_ticker, Close
       FROM StockQuote 
       WHERE Date_Calendar=(SELECT MAX(Date_Calendar) FROM StockQuote)
     )
-    SELECT stock_ticker, stock_count, close, stock_count * close AS value
+    SELECT stock_ticker AS ticker, stock_count AS count, close, stock_count * close AS value
     FROM Client u JOIN Portfolio_Has_Stock phs ON u.client_uid = phs.client_uid
-    JOIN LatestQuotes lq ON lq.asset_ticker = phs.stock_ticker
+    JOIN LatestStockQuotes lsq ON lsq.asset_ticker = phs.stock_ticker
+    WHERE u.client_uid='${id}'
+    UNION
+    SELECT crypto_ticker AS ticker, crypto_count AS count, close, crypto_count * close AS value
+    FROM Client u JOIN Portfolio_Has_Crypto phc ON u.client_uid = phc.client_uid
+    JOIN LatestCryptoQuotes lcq ON lcq.asset_ticker = phc.crypto_ticker
     WHERE u.client_uid='${id}'
   `;
   try {
@@ -495,12 +504,21 @@ async function addAssetToPortfolio(req, res) {
   var id = req.params.id;
   var ticker = req.params.ticker;
   var count = req.params.count;
-  const query = `
+  var query = `
     INSERT INTO Portfolio_Has_Stock (client_uid, stock_ticker, stock_count) 
     VALUES ('${id}', '${ticker}', ${count})
   `
+  //currently, we only have 1 crypto ticker (BTC), so check that to see what type of insertion we should do
+  if (ticker.toUpperCase() === 'BTC') {
+    query = `
+    INSERT INTO Portfolio_Has_Crypto (client_uid, crypto_ticker, crypto_count)
+    VALUES ('${id}', '${ticker}', ${count})
+    `
+  }
+
   try {
     const result = await connection.execute(query);
+
     res.json({
       "assets": result.rows
     });
@@ -514,10 +532,17 @@ async function removeAssetFromPortfolio(req, res) {
   var id = req.params.id;
   var ticker = req.params.ticker;
 
-  const query = `
+  var query = `
     DELETE FROM Portfolio_Has_Stock 
     WHERE client_uid='${id}' AND stock_ticker='${ticker}'
   `
+  //currently, we only have 1 crypto ticker (BTC), so check that to see what type of insertion we should do
+  if (ticker.toUpperCase() === 'BTC') {
+    query = `
+      DELETE FROM Portfolio_Has_Crypto
+      WHERE client_uid='${id}' AND crypto_ticker='${ticker}'
+    `
+  }
   try {
     const result = await connection.execute(query);
     res.json({
@@ -534,10 +559,18 @@ async function updateAssetQuantity(req, res) {
   var ticker = req.params.ticker;
   var count = req.params.count;
 
-  const query = `
+  var query = `
     UPDATE Portfolio_Has_STOCK SET stock_count=${count}
     WHERE client_uid='${id}' AND stock_ticker='${ticker}'
   `
+  //currently, we only have 1 crypto ticker (BTC), so check that to see what type of insertion we should do
+  if (ticker.toUpperCase() === 'BTC') {
+    query = `
+    UPDATE Portfolio_Has_Crypto SET crypto_count=${count}
+    WHERE client_uid='${id}' AND crypto_ticker='${ticker}'
+    `
+  }
+
   try {
     const result = await connection.execute(query);
     res.json({
