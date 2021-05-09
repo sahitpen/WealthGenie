@@ -238,12 +238,12 @@ export default class Dashboard extends React.Component {
         {/* Stock Search Section */}
         <br />
         <div className="container d-flex justify-content-center" >
-          <form class="form-inline my-2 my-lg-0">
-            <div class="input-group mb-3">
-              <input type="text" id="tickerInput" class="form-control" placeholder="Ticker" aria-label="Ticker" />
-              <input type="text" id="startDateInput" class="form-control" placeholder="Start (M/D/YYYY)" aria-label="StartDate" />
-              <input type="text" id="endDateInput" class="form-control" placeholder="End (M/D/YYYY)" aria-label="EndDate" />
-              <button class="form-control btn btn-outline-success my-2 my-sm-0" onClick={this.submitInputStockSearch}>Search</button>
+          <form className="form-inline my-2 my-lg-0">
+            <div className="input-group mb-3">
+              <input type="text" id="tickerInput" className="form-control" placeholder="Ticker" aria-label="Ticker" />
+              <input type="text" id="startDateInput" className="form-control" placeholder="Start (M/D/YYYY)" aria-label="StartDate" />
+              <input type="text" id="endDateInput" className="form-control" placeholder="End (M/D/YYYY)" aria-label="EndDate" />
+              <button className="form-control btn btn-outline-success my-2 my-sm-0" onClick={this.submitInputStockSearch}>Search</button>
             </div>
           </form>
         </div>
@@ -251,47 +251,47 @@ export default class Dashboard extends React.Component {
         {/* Stock Cards Section */}
         <br />
         <div className="container">
-          <div class="card-columns">
-            <div class="card text-white bg-success mb-3">
-              <div class="card-header">Growth of {this.state.ticker}</div>
-              <div class="card-body">
-                <h5 class="card-title"><b>{this.state.percentGrowth} %</b></h5>
-                <p class="card-text">between {this.state.startDate} and {this.state.endDate}. The price went from ${this.state.startingPrice} to ${this.state.endingPrice}</p>
+          <div className="card-columns">
+            <div className="card text-white bg-success mb-3">
+              <div className="card-header">Growth of {this.state.ticker}</div>
+              <div className="card-body">
+                <h5 className="card-title"><b>{this.state.percentGrowth} %</b></h5>
+                <p className="card-text">between {this.state.startDate} and {this.state.endDate}. The price went from ${this.state.startingPrice} to ${this.state.endingPrice}</p>
               </div>
             </div>
-            <div class="card">
-              <div class="card-body">
-                <h5 class="card-title">Highest Price of {this.state.ticker}</h5>
-                <p class="card-text">${this.state.highPrice} was the highest price, reached on {this.state.highPriceDate}.</p>
+            <div className="card">
+              <div className="card-body">
+                <h5 className="card-title">Highest Price of {this.state.ticker}</h5>
+                <p className="card-text">${this.state.highPrice} was the highest price, reached on {this.state.highPriceDate}.</p>
               </div>
             </div>
-            <div class="card bg-light mb-3" >
-              <div class="card-header">Most Change in One Day</div>
-              <div class="card-body">
-                <h5 class="card-title">{this.state.changeDate}</h5>
-                <p class="card-text">On this day, {this.state.ticker} gained {this.state.changePercent}% in one trading day. The price jumped from ${this.state.changeOpen} to ${this.state.changeClose}</p>
+            <div className="card bg-light mb-3" >
+              <div className="card-header">Most Change in One Day</div>
+              <div className="card-body">
+                <h5 className="card-title">{this.state.changeDate}</h5>
+                <p className="card-text">On this day, {this.state.ticker} gained {this.state.changePercent}% in one trading day. The price jumped from ${this.state.changeOpen} to ${this.state.changeClose}</p>
               </div>
             </div>
-            <div class="card">
-              <div class="card-body">
-                <h5 class="card-title">Lowest Price of {this.state.ticker} </h5>
-                <p class="card-text">${this.state.lowPrice} was the lowest price, reached on {this.state.lowPriceDate}.</p>
+            <div className="card">
+              <div className="card-body">
+                <h5 className="card-title">Lowest Price of {this.state.ticker} </h5>
+                <p className="card-text">${this.state.lowPrice} was the lowest price, reached on {this.state.lowPriceDate}.</p>
               </div>
             </div>
-            <div class="card text-white bg-dark mb-3">
-              <div class="card-header">Average Trading Volume</div>
-              <div class="card-body">
-                <h5 class="card-title">{this.state.avgVolume}</h5>
-                <p class="card-text">On average, {this.state.ticker} was traded {this.state.avgVolume} times per trading day between {this.state.startDate} and {this.state.endDate}</p>
+            <div className="card text-white bg-dark mb-3">
+              <div className="card-header">Average Trading Volume</div>
+              <div className="card-body">
+                <h5 className="card-title">{this.state.avgVolume}</h5>
+                <p className="card-text">On average, {this.state.ticker} was traded {this.state.avgVolume} times per trading day between {this.state.startDate} and {this.state.endDate}</p>
               </div>
             </div>
-            <div class="card">
-              <div class="card-header">
+            <div className="card">
+              <div className="card-header">
                 Trading Volume
               </div>
-              <ul class="list-group list-group-flush">
-                <li class="list-group-item">High of <b>{this.state.highVolume}</b> on {this.state.highVolumeDate}</li>
-                <li class="list-group-item">Low of <b>{this.state.lowVolume}</b> on {this.state.lowVolumeDate}</li>
+              <ul className="list-group list-group-flush">
+                <li className="list-group-item">High of <b>{this.state.highVolume}</b> on {this.state.highVolumeDate}</li>
+                <li className="list-group-item">Low of <b>{this.state.lowVolume}</b> on {this.state.lowVolumeDate}</li>
               </ul>
             </div>
           </div>
@@ -301,9 +301,9 @@ export default class Dashboard extends React.Component {
         <div className="container movies-container">
           <h3>
             Companies&nbsp;
-            <small class="text-muted">with the closest returns to {this.state.ticker}</small>
+            <small className="text-muted">with the closest returns to {this.state.ticker}</small>
           </h3>
-          <table class="table table-hover">
+          <table className="table table-hover">
             <thead>
               <tr>
                 <th scope="col">#</th>
@@ -323,16 +323,16 @@ export default class Dashboard extends React.Component {
         <div className="container movies-container">
           <h3>
             Other&nbsp;
-            <small class="text-muted">popular companies</small>
+            <small className="text-muted">popular companies</small>
           </h3>
-          <div class="btn-group d-flex justify-content-center" role="group" aria-label="Basic outlined example">
-            <button type="button" value="AAPL" onClick={this.submitDefaultStockSearch} class="btn btn-outline-secondary">Apple</button>
-            <button type="button" value="AMZN" onClick={this.submitDefaultStockSearch} class="btn btn-outline-secondary">Amazon</button>
-            <button type="button" value="FB" onClick={this.submitDefaultStockSearch} class="btn btn-outline-secondary">Facebook</button>
-            <button type="button" value="MSFT" onClick={this.submitDefaultStockSearch} class="btn btn-outline-secondary">Microsoft</button>
-            <button type="button" value="NFLX" onClick={this.submitDefaultStockSearch} class="btn btn-outline-secondary">Netflix</button>
-            <button type="button" value="GOOGL" onClick={this.submitDefaultStockSearch} class="btn btn-outline-secondary">Alphabet</button>
-            <button type="button" value="NVDA" onClick={this.submitDefaultStockSearch} class="btn btn-outline-secondary">Nvidia</button>
+          <div className="btn-group d-flex justify-content-center" role="group" aria-label="Basic outlined example">
+            <button type="button" value="AAPL" onClick={this.submitDefaultStockSearch} className="btn btn-outline-secondary">Apple</button>
+            <button type="button" value="AMZN" onClick={this.submitDefaultStockSearch} className="btn btn-outline-secondary">Amazon</button>
+            <button type="button" value="FB" onClick={this.submitDefaultStockSearch} className="btn btn-outline-secondary">Facebook</button>
+            <button type="button" value="MSFT" onClick={this.submitDefaultStockSearch} className="btn btn-outline-secondary">Microsoft</button>
+            <button type="button" value="NFLX" onClick={this.submitDefaultStockSearch} className="btn btn-outline-secondary">Netflix</button>
+            <button type="button" value="GOOGL" onClick={this.submitDefaultStockSearch} className="btn btn-outline-secondary">Alphabet</button>
+            <button type="button" value="NVDA" onClick={this.submitDefaultStockSearch} className="btn btn-outline-secondary">Nvidia</button>
           </div>
         </div>
 
@@ -341,16 +341,16 @@ export default class Dashboard extends React.Component {
         <div className="container movies-container" >
           <h3>
             Industry&nbsp;
-            <small class="text-muted">analysis</small>
+            <small className="text-muted">analysis</small>
           </h3>
-          <form class="form-inline my-2 my-lg-0">
-            <div class="input-group mb-3">
-              <select id="industryInput" class="form-select form-select-border-color">
+          <form className="form-inline my-2 my-lg-0">
+            <div className="input-group mb-3">
+              <select id="industryInput" className="form-select form-select-border-color">
                 {this.state.industryOptions}
               </select>
-              <input type="text" id="startDateIndustryInput" class="form-control" placeholder="Start (M/D/YYYY)" aria-label="StartDate" />
-              <input type="text" id="endDateIndustryInput" class="form-control" placeholder="End (M/D/YYYY)" aria-label="EndDate" />
-              <button class="form-control btn btn-outline-success my-2 my-sm-0" onClick={this.submitIndustrySearch}>Search</button>
+              <input type="text" id="startDateIndustryInput" className="form-control" placeholder="Start (M/D/YYYY)" aria-label="StartDate" />
+              <input type="text" id="endDateIndustryInput" className="form-control" placeholder="End (M/D/YYYY)" aria-label="EndDate" />
+              <button className="form-control btn btn-outline-success my-2 my-sm-0" onClick={this.submitIndustrySearch}>Search</button>
             </div>
           </form>
         </div>
@@ -358,23 +358,23 @@ export default class Dashboard extends React.Component {
         {/* Industry Cards Section */}
         <br />
         <div className="container">
-          <div class="card-columns">
-            <div class="card text-white bg-success mb-3">
-              <div class="card-header">Growth of Industry</div>
-              <div class="card-body">
-                <h5 class="card-title"><b>{this.state.industryGrowth} %</b></h5>
-                <p class="card-text">between {this.state.industryStartDate} and {this.state.industryEndDate}.</p>
+          <div className="card-columns">
+            <div className="card text-white bg-success mb-3">
+              <div className="card-header">Growth of Industry</div>
+              <div className="card-body">
+                <h5 className="card-title"><b>{this.state.industryGrowth} %</b></h5>
+                <p className="card-text">between {this.state.industryStartDate} and {this.state.industryEndDate}.</p>
               </div>
             </div>
-            <div class="card bg-light mb-3">
-              <div class="card-header">Number of {this.state.industry} Stocks</div>
-              <div class="card-body">
-                <h5 class="card-title"><b>{this.state.numStocksIndustry}</b></h5>
-                <p class="card-text">{this.state.industry} stocks in the S&P 500.</p>
+            <div className="card bg-light mb-3">
+              <div className="card-header">Number of {this.state.industry} Stocks</div>
+              <div className="card-body">
+                <h5 className="card-title"><b>{this.state.numStocksIndustry}</b></h5>
+                <p className="card-text">{this.state.industry} stocks in the S&P 500.</p>
               </div>
             </div>
-            <div class="card">
-              <table class="table table-hover">
+            <div className="card">
+              <table className="table table-hover">
                 <thead>
                   <tr>
                     <th scope="col">Top Companies in Industry</th>
@@ -386,8 +386,8 @@ export default class Dashboard extends React.Component {
                 </tbody>
               </table>
             </div>
-            <div class="card">
-              <table class="table table-hover">
+            <div className="card">
+              <table className="table table-hover">
                 <thead>
                   <tr>
                     <th scope="col">Worst Companies in Industry</th>
