@@ -19,6 +19,8 @@ app.use(bodyParser.urlencoded({ extended: false }));
 
 /* ---- (Bitcoin Search) ---- */
 app.get('/crypto/:ticker/:startDate/:endDate', routes.getCryptoData);
+app.get('/crypto/:ticker/:industry/:startDate/:endDate', routes.getCryptoComparisonData);
+
 
 /* ---- (Stock Search) ---- */
 app.get('/stock/:ticker/:startDate/:endDate', routes.getStockData);

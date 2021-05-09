@@ -1,12 +1,14 @@
 import React from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import Modal from "react-bootstrap/Modal";
 
 export default class PageNavbar extends React.Component {
 	constructor(props) {
 		super(props);
 
 		this.state = {
-			navDivs: []
+			navDivs: [],
+			isOpen: false
 		};
 	};
 
@@ -26,6 +28,9 @@ export default class PageNavbar extends React.Component {
 		});
 	};
 
+	openModal = () => this.setState({ isOpen: true });
+  closeModal = () => this.setState({ isOpen: false });
+
 	render() {
 		return (
 			<div className="PageNavbar">
@@ -38,11 +43,21 @@ export default class PageNavbar extends React.Component {
 							{this.state.navDivs}
 						</div>
 					</div>
-					<form className="form-inline">
-						<button className="btn btn-success my-2 my-sm-0" type="submit">Login</button>
-					</form>
+					<button className="btn btn-success my-2 my-sm-0" type="submit" onClick={this.openModal}>Login</button>
 				</nav>
+
+				<Modal show={this.state.isOpen} onHide={this.closeModal}>
+					<Modal.Header>
+						<Modal.Title>Hi</Modal.Title>
+					</Modal.Header>
+					<Modal.Body>The body</Modal.Body>
+					<Modal.Footer>
+						<button onClick={this.closeModal}>Cancel</button>
+						<button>Save</button>
+					</Modal.Footer>
+				</Modal>
 			</div>
+			
 		);
 	};
 };
