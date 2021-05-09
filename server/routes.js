@@ -578,6 +578,51 @@ async function updateAssetQuantity(req, res) {
   }
 }
 
+async function getPortfolioPercentGrowthIndividual(req, res) {
+  await init()
+  var id = req.params.id;
+
+  var query = `
+    WITH LatestStockQuotes AS (
+      SELECT asset_ticker, Close
+      FROM StockQuote sq
+      WHERE Date_Calendar=(SELECT max(Date_Calendar) FROM StockQuote sq2 WHERE sq.asset_ticker = sq2.asset_ticker)
+    ), EarliestStockQuotes AS (
+        SELECT asset_ticker, Close
+        FROM StockQuote sq
+        WHERE Date_Calendar=(SELECT min(Date_Calendar) FROM StockQuote sq2 WHERE sq.asset_ticker = sq2.asset_ticker)
+    ), LatestCryptoQuotes AS (
+        SELECT asset_ticker, Close
+        FROM CryptoQuote cq
+        WHERE Calendar_Date=(SELECT max(Calendar_Date) FROM CryptoQuote cq2 WHERE cq.asset_ticker = cq2.asset_ticker)
+    ), EarliestCryptoQuotes AS (
+        SELECT asset_ticker, Close
+        FROM CryptoQuote cq
+        WHERE Calendar_Date=(SELECT min(Calendar_Date) FROM CryptoQuote cq2 WHERE cq.asset_ticker = cq2.asset_ticker)
+    )
+    SELECT stock_ticker AS Ticker, lsq.close AS last_close, esq.close as first_close, ((lsq.close - esq.close) / esq.close * 100) as percent_growth
+    FROM Portfolio_Has_Stock phs
+    JOIN LatestStockQuotes lsq ON lsq.asset_ticker = phs.stock_ticker
+    JOIN EarliestStockQuotes esq ON esq.asset_ticker = phs.stock_ticker
+    WHERE client_uid = '${id}'
+    UNION ALL
+    SELECT crypto_ticker AS Ticker, lcq.close AS last_close, ecq.close as first_close, ((lcq.close - ecq.close) / ecq.close * 100) as percent_growth
+    FROM Portfolio_Has_Crypto phc
+    JOIN LatestCryptoQuotes lcq ON lcq.asset_ticker = phc.crypto_ticker
+    JOIN EarliestCryptoQuotes ecq ON ecq.asset_ticker = phc.crypto_ticker
+    WHERE client_uid = '${id}'
+  `
+  console.log(query)
+  try {
+    const result = await connection.execute(query);
+    res.json({
+      "assets": result.rows
+    });
+  } catch (err) {
+    console.log(err);
+  }
+}
+
 module.exports = {
   getStockData: getStockData,
   getIndustryData: getIndustryData,
@@ -588,5 +633,6 @@ module.exports = {
   addAssetToPortfolio: addAssetToPortfolio,
   removeAssetFromPortfolio: removeAssetFromPortfolio,
   updateAssetQuantity: updateAssetQuantity,
+  getPortfolioPercentGrowthIndividual: getPortfolioPercentGrowthIndividual,
   getCryptoComparisonData: getCryptoComparisonData
 };
