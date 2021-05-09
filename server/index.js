@@ -42,6 +42,9 @@ app.get('/removePortfolio/:id/:ticker', routes.removeAssetFromPortfolio);
 /* ---- (Update Portfolio Quantity) ---- */
 app.get('/updatePortfolio/:id/:ticker/:count', routes.updateAssetQuantity);
 
+/* ---- (Update Portfolio Quantity) ---- */
+app.get('/getPortfolioPercentGrowth/:id/individual', routes.getPortfolioPercentGrowthIndividual);
+
 
 app.listen(8081, () => {
 	console.log(`Server listening on PORT 8081`);
