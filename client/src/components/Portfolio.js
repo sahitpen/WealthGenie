@@ -29,6 +29,7 @@ export default class Portfolio extends React.Component {
       {
         method: 'GET' // The type of HTTP request.
       }).then(res => {
+        console.log("http://localhost:8081/getPortfolio/" + this.state.id)
         return res.json()
       }, err => {
         console.log(err)
@@ -67,6 +68,7 @@ export default class Portfolio extends React.Component {
   };
 
   addStockWithTicker(ticker) {
+    console.log("http://localhost:8081/addPortfolio/" + this.state.id + "/" + ticker + "/" + 1)
     fetch("http://localhost:8081/addPortfolio/" + this.state.id + "/" + ticker + "/" + 1,
       {
         method: 'GET' // The type of HTTP request.
