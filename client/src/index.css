@@ -21,11 +21,3 @@ code {
   display: flex;
   width: 5vw;
 }
-
-div.fade.in.modal {
-  display:flex !important;
-}
-
-.modal-dialog {
-  margin: auto;
-}

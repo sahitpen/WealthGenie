@@ -8,7 +8,11 @@ export default class PageNavbar extends React.Component {
 
 		this.state = {
 			navDivs: [],
-			isOpen: false
+			signUpEmail: '',
+			signUpPass: '',
+			signUpPass2: '',
+			loginEmail: '',
+			loginPass: ''
 		};
 	};
 
@@ -28,8 +32,44 @@ export default class PageNavbar extends React.Component {
 		});
 	};
 
-	openModal = () => this.setState({ isOpen: true });
-  closeModal = () => this.setState({ isOpen: false });
+	openLoginModal = () => this.setState({ isLoginOpen: true });
+  closeLoginModal = () => this.setState({ isLoginOpen: false });
+
+	openSignUpModal = () => this.setState({ isSignUpOpen: true });
+  closeSignUpModal = () => this.setState({ isSignUpOpen: false });
+
+	updateInput(type, value) {
+		if (type == "signUpEmail") {
+			this.setState({ signUpEmail: value });
+		} else if (type == "signUpPass") {
+			this.setState({ signUpPass: value });
+		} else if (type == "signUpPass2") {
+			this.setState({ signUpPass2: value });
+		} else if (type == "loginEmail") {
+			this.setState({ loginEmail: value });
+		} else if (type == "loginPass") {
+			this.setState({ loginPass: value });
+		}
+	}
+
+	login() {
+		var error = false;
+
+		if (this.state.loginEmail == "" || this.state.loginPass) {
+			alert("You must enter an email and password")
+		}
+
+		const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+		if (!re.test(String(this.state.loginEmail).toLowerCase())) {
+			alert("The email entered is invalid");
+			error = true;
+		}
+
+		if (!error) {
+			//login 
+		}
+
+	}
 
 	render() {
 		return (
@@ -43,17 +83,55 @@ export default class PageNavbar extends React.Component {
 							{this.state.navDivs}
 						</div>
 					</div>
-					<button className="btn btn-success my-2 my-sm-0" type="submit" onClick={this.openModal}>Login</button>
+					<div className="navbarButtons">
+						<button className="btn btn-secondary my-2 my-sm-0" type="submit" onClick={this.openSignUpModal}>Sign Up</button>
+						<button className="btn btn-primary my-2 my-sm-0" onClick={this.openLoginModal}>Login</button>
+					</div>
 				</nav>
 
-				<Modal show={this.state.isOpen} onHide={this.closeModal}>
-					<Modal.Header>
-						<Modal.Title>Hi</Modal.Title>
+				<Modal show={this.state.isSignUpOpen} onHide={this.closeSignUpModal}>
+					<Modal.Header closeButton>
+						<Modal.Title>Create Account</Modal.Title>
 					</Modal.Header>
-					<Modal.Body>The body</Modal.Body>
+					<Modal.Body>
+						<form>
+							<div className="form-group">
+								<label>Email: </label>
+								<input type="email" className="form-control" placeholder="Enter email" onChange={(e)=>this.updateInput('signUpEmail', e.target.value)} />
+							</div>
+							<div className="form-group">
+								<label>Password: </label>
+								<input type="password" className="form-control" placeholder="Enter password"  onChange={(e)=>this.updateInput('signUpPass', e.target.value)} />
+							</div>
+							<div className="form-group">
+								<label>Re-enter Password: </label>
+								<input type="password" className="form-control" placeholder="Enter password"  onChange={(e)=>this.updateInput('signUpPass2', e.target.value)} />
+							</div>
+						</form>
+					</Modal.Body>
 					<Modal.Footer>
-						<button onClick={this.closeModal}>Cancel</button>
-						<button>Save</button>
+						<button type="submit" className="btn btn-primary">Sign Up</button>
+					</Modal.Footer>
+				</Modal>
+
+				<Modal show={this.state.isLoginOpen} onHide={this.closeLoginModal}>
+					<Modal.Header closeButton>
+						<Modal.Title>Login</Modal.Title>
+					</Modal.Header>
+					<Modal.Body>
+						<form>
+							<div className="form-group">
+								<label>Email: </label>
+								<input type="email" className="form-control" placeholder="Enter email"  onChange={(e)=>this.updateInput('loginEmail', e.target.value)}/>
+							</div>
+							<div className="form-group">
+								<label>Password: </label>
+								<input type="password" className="form-control" placeholder="Enter password"  onChange={(e)=>this.updateInput('signUpEmail', e.target.value)}/>
+							</div>
+						</form>
+					</Modal.Body>
+					<Modal.Footer>
+						<button className="btn btn-primary" onClick={this.login}>Login</button>
 					</Modal.Footer>
 				</Modal>
 			</div>
