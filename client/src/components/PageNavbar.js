@@ -1,6 +1,12 @@
 import React from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Modal from "react-bootstrap/Modal";
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Link
+} from "react-router-dom";
 
 export default class PageNavbar extends React.Component {
 	constructor(props) {
@@ -14,6 +20,8 @@ export default class PageNavbar extends React.Component {
 			loginEmail: '',
 			loginPass: ''
 		};
+		this.signUp = this.signUp.bind(this);
+		this.login = this.login.bind(this);
 	};
 
 	componentDidMount() {
@@ -21,9 +29,11 @@ export default class PageNavbar extends React.Component {
 
 		let navbarDivs = pageList.map((page, i) => {
 			if (this.props.active === page) {
-				return <a className="nav-item nav-link active" key={i} href={"/" + page}>{page.charAt(0).toUpperCase() + page.substring(1, page.length)}</a>
+				//return <a className="nav-item nav-link active" key={i} href={"/" + page}>{page.charAt(0).toUpperCase() + page.substring(1, page.length)}</a>
+				return <Link className="nav-item nav-link active" key={i} to={"/" + page}>{page.charAt(0).toUpperCase() + page.substring(1, page.length)}</Link>
 			} else {
-				return <a className="nav-item nav-link" key={i} href={"/" + page}>{page.charAt(0).toUpperCase() + page.substring(1, page.length)}</a>
+				//return <a className="nav-item nav-link" key={i} href={"/" + page}>{page.charAt(0).toUpperCase() + page.substring(1, page.length)}</a>
+				return <Link className="nav-item nav-link" key={i} to={"/" + page}>{page.charAt(0).toUpperCase() + page.substring(1, page.length)}</Link>
 			}
 		});
 
@@ -52,26 +62,70 @@ export default class PageNavbar extends React.Component {
 		}
 	}
 
-	login() {
-		var error = false;
-
-		if (this.state.loginEmail == "" || this.state.loginPass) {
-			alert("You must enter an email and password")
-		}
-
+	signUp() {
 		const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-		if (!re.test(String(this.state.loginEmail).toLowerCase())) {
+		if (this.state.signUpEmail == "" || this.state.signUpPass == "") {
+			alert("You must enter an email and password")
+		} else if (this.state.signUpPass2 == "") {
+			alert("You must re-enter your password")
+		} else if (!re.test(String(this.state.signUpEmail).toLowerCase())) {
 			alert("The email entered is invalid");
-			error = true;
+		} else if (this.state.signUpPass != this.state.signUpPass2) {
+			alert("The passwords do not match");
+		} else {
+			fetch("http://localhost:8081/signup/" + this.state.signUpEmail + "/" + this.state.signUpPass,
+      {
+        method: 'GET' // The type of HTTP request.
+      }).then(res => {
+        return res.json()
+      }, err => {
+        console.log(err);
+      }).then(loginInfo => {
+        if (loginInfo.id == null){
+					alert("An account already exists with this email");
+				} else {
+					alert("Created Account");
+					this.closeSignUpModal();
+				}
+      }, err => {
+        console.log(err);
+      });
 		}
+	}
 
-		if (!error) {
-			//login 
+	login() {
+		const re = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+		if (this.state.loginEmail == "" || this.state.loginPass == "") {
+			alert("You must enter an email and password")
+		} else if (!re.test(String(this.state.loginEmail).toLowerCase())) {
+			alert("The email entered is invalid");
+		} else {
+			fetch("http://localhost:8081/login/" + this.state.loginEmail + "/" + this.state.loginPass,
+      {
+        method: 'GET' // The type of HTTP request.
+      }).then(res => {
+        return res.json()
+      }, err => {
+        console.log(err);
+      }).then(loginInfo => {
+        if (loginInfo.id == null){
+					alert("The email or password is incorrect");
+				} else {
+					this.props.changeLoginInfo(loginInfo.id, true)
+					this.closeLoginModal();
+				}
+      }, err => {
+        console.log(err);
+      });
 		}
+	}
 
+	logout() {
+		this.props.changeLoginInfo('', false);
 	}
 
 	render() {
+		const loggedIn = this.props.loggedIn;
 		return (
 			<div className="PageNavbar">
 				<nav className="navbar navbar-expand-lg navbar-light" style={{ backgroundColor: "#f1f2f6" }}>
@@ -83,10 +137,13 @@ export default class PageNavbar extends React.Component {
 							{this.state.navDivs}
 						</div>
 					</div>
-					<div className="navbarButtons">
-						<button className="btn btn-secondary my-2 my-sm-0" type="submit" onClick={this.openSignUpModal}>Sign Up</button>
-						<button className="btn btn-primary my-2 my-sm-0" onClick={this.openLoginModal}>Login</button>
-					</div>
+					{loggedIn
+						? <button className="btn btn-primary my-2 my-sm-0" onClick={this.logout}>Logout</button>
+						: <div className="navbarButtons">
+								<button className="btn btn-secondary my-2 my-sm-0" onClick={this.openSignUpModal}>Sign Up</button>
+								<button className="btn btn-primary my-2 my-sm-0" onClick={this.openLoginModal}>Login</button>
+							</div>
+					}
 				</nav>
 
 				<Modal show={this.state.isSignUpOpen} onHide={this.closeSignUpModal}>
@@ -110,7 +167,7 @@ export default class PageNavbar extends React.Component {
 						</form>
 					</Modal.Body>
 					<Modal.Footer>
-						<button type="submit" className="btn btn-primary">Sign Up</button>
+						<button type="submit" className="btn btn-primary" onClick={this.signUp}>Sign Up</button>
 					</Modal.Footer>
 				</Modal>
 
@@ -126,7 +183,7 @@ export default class PageNavbar extends React.Component {
 							</div>
 							<div className="form-group">
 								<label>Password: </label>
-								<input type="password" className="form-control" placeholder="Enter password"  onChange={(e)=>this.updateInput('signUpEmail', e.target.value)}/>
+								<input type="password" className="form-control" placeholder="Enter password"  onChange={(e)=>this.updateInput('loginPass', e.target.value)}/>
 							</div>
 						</form>
 					</Modal.Body>

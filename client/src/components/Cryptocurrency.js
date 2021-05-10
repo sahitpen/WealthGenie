@@ -189,7 +189,7 @@ export default class Cryptocurrency extends React.Component {
     return (
       <div className="Dashboard">
 
-        <PageNavbar active="dashboard" />
+        <PageNavbar loggedIn={this.props.loggedIn} user_id={this.props.user_id} changeLoginInfo={this.props.changeLoginInfo} active="cryptocurrency" />
 
         <br />
 

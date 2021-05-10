@@ -10,6 +10,22 @@ import Portfolio from './Portfolio';
 
 export default class App extends React.Component {
 
+	constructor(props) {
+		super(props);
+
+		this.state = {
+			id: '',
+			loggedIn: false,
+		};
+	};
+
+	changeLoginInfo(id, loggedIn) {
+		this.setState({
+			id: id,
+			loggedIn: loggedIn
+		})
+	}
+
 	render() {
 		return (
 			<div className="App">
@@ -18,20 +34,20 @@ export default class App extends React.Component {
 						<Route
 							exact
 							path="/"
-							render={() => <Dashboard />}
+							render={() => <Dashboard loggedIn={this.state.loggedIn} user_id={this.state.id} changeLoginInfo={this.changeLoginInfo.bind(this)}/>}
 						/>
 						<Route
 							exact
 							path="/stock"
-							render={() => <Dashboard />}
+							render={() => <Dashboard loggedIn={this.state.loggedIn} user_id={this.state.id} changeLoginInfo={this.changeLoginInfo.bind(this)} />}
 						/>
 						<Route
 							path="/cryptocurrency"
-							render={() => <Cryptocurrency />}
+							render={() => <Cryptocurrency loggedIn={this.state.loggedIn} user_id={this.state.id} changeLoginInfo={this.changeLoginInfo.bind(this)} />}
 						/>
 						<Route
 							path="/portfolio"
-							render={() => <Portfolio />}
+							render={() => <Portfolio loggedIn={this.state.loggedIn} user_id={this.state.id} changeLoginInfo={this.changeLoginInfo.bind(this)} />}
 						/>
 					</Switch>
 				</Router>

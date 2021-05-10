@@ -226,7 +226,7 @@ export default class Dashboard extends React.Component {
     return (
       <div className="Dashboard">
 
-        <PageNavbar active="dashboard" />
+        <PageNavbar loggedIn={this.props.loggedIn} user_id={this.props.user_id} changeLoginInfo={this.props.changeLoginInfo} active="stock" />
 
         {/* Title Section */}
         <br />

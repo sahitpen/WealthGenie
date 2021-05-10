@@ -1,6 +1,7 @@
 const config = require('./db-config.js');
 const mysql = require('mysql');
 const oracle = require('oracledb');
+const e = require('express');
 oracle.autoCommit = true;
 
 var connection = null;
@@ -17,6 +18,64 @@ async function init() {
 /* -------------------------------------------------- */
 /* ------------------- Route Handlers --------------- */
 /* -------------------------------------------------- */
+
+/* ---- Login ---- */
+async function signUp(req, res) {
+  await init()
+  var email = req.params.email;
+  var password = req.params.password;
+
+  // check if email already exists
+  var length = 0;
+  var query = `
+    SELECT * FROM CLIENT
+    WHERE client_uid='${email}'
+  `
+  try {
+    const result1 = await connection.execute(query);
+    length = result1.rows.length;
+  } catch (err) {
+    console.log(err);
+  }
+
+  // add user to database
+  if (length == 0) {
+    var query = `
+      INSERT INTO Client (client_uid, password) 
+      VALUES ('${email}', '${password}')
+    `
+    try {
+      const result2 = await connection.execute(query);
+      res.json({ "id": email });
+    } catch (err) {
+      console.log(err);
+    }
+  } else {
+    res.json({ "id": null });
+  }
+}
+
+async function login(req, res) {
+  var email = req.params.email;
+  var password = req.params.password;
+
+  var query = `
+    SELECT * FROM CLIENT
+    WHERE client_uid='${email}' AND password='${password}'
+  `
+  console.log(query);
+  try {
+    const result = await connection.execute(query);
+    console.log(result.rows);
+    if (result.rows.length == 0) {
+      res.json({ id: null });
+    } else {
+      res.json({ id: email });
+    }
+  } catch (err) {
+    console.log(err);
+  }
+}
 
 /* ---- Crypto Search ---- */
 async function getCryptoData(req, res) {
@@ -624,6 +683,8 @@ async function getPortfolioPercentGrowthIndividual(req, res) {
 }
 
 module.exports = {
+  signUp: signUp,
+  login: login,
   getStockData: getStockData,
   getIndustryData: getIndustryData,
   getIndustryNames: getIndustryNames,

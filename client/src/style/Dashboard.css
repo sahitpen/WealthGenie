@@ -36,3 +36,9 @@
 .navbarButtons > button {
   margin-right: 1vw;
 }
+
+.loginMessage {
+  margin-top: 5vh;
+  padding: 2vh;
+  text-align: center;
+}
