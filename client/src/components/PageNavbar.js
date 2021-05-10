@@ -22,6 +22,7 @@ export default class PageNavbar extends React.Component {
 		};
 		this.signUp = this.signUp.bind(this);
 		this.login = this.login.bind(this);
+		this.logout = this.logout.bind(this);
 	};
 
 	componentDidMount() {
@@ -138,7 +139,7 @@ export default class PageNavbar extends React.Component {
 						</div>
 					</div>
 					{loggedIn
-						? <button className="btn btn-primary my-2 my-sm-0" onClick={this.logout}>Logout</button>
+						? <button className="btn btn-success my-2 my-sm-0" onClick={this.logout}>Logout</button>
 						: <div className="navbarButtons">
 							<button className="btn btn-secondary my-2 my-sm-0" onClick={this.openSignUpModal}>Sign Up</button>
 							<button className="btn btn-success my-2 my-sm-0" onClick={this.openLoginModal}>Login</button>
@@ -167,7 +168,7 @@ export default class PageNavbar extends React.Component {
 						</form>
 					</Modal.Body>
 					<Modal.Footer>
-						<button type="submit" className="btn btn-primary" onClick={this.signUp}>Sign Up</button>
+						<button type="submit" className="btn btn-success" onClick={this.signUp}>Sign Up</button>
 					</Modal.Footer>
 				</Modal>
 
@@ -188,7 +189,7 @@ export default class PageNavbar extends React.Component {
 						</form>
 					</Modal.Body>
 					<Modal.Footer>
-						<button className="btn btn-primary" onClick={this.login}>Login</button>
+						<button className="btn btn-success" onClick={this.login}>Login</button>
 					</Modal.Footer>
 				</Modal>
 			</div>

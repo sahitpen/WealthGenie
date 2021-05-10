@@ -56,6 +56,7 @@ async function signUp(req, res) {
 }
 
 async function login(req, res) {
+  await init();
   var email = req.params.email;
   var password = req.params.password;
 
@@ -660,7 +661,7 @@ async function getPortfolioPercentGrowthIndividual(req, res) {
           WHERE sq.asset_ticker=tq.asset_ticker
           AND sq.date_calendar <= TO_DATE('${endDate}', 'YYYY-MM-DD')
         )
-    ), LatestCryptoQuotes AS (
+    ), EarliestCryptoQuotes AS (
           SELECT * FROM CryptoQuote tq
           WHERE CALENDAR_DATE = (
             SELECT MIN(sq.calendar_date)
@@ -668,7 +669,7 @@ async function getPortfolioPercentGrowthIndividual(req, res) {
             WHERE sq.asset_ticker=tq.asset_ticker
             AND sq.calendar_date >= TO_DATE('${startDate}', 'YYYY-MM-DD')
           )
-    ), EarliestCryptoQuotes AS (
+    ), LatestCryptoQuotes AS (
           SELECT * FROM CryptoQuote tq
           WHERE CALENDAR_DATE = (
             SELECT MAX(sq.calendar_date)
@@ -691,6 +692,7 @@ async function getPortfolioPercentGrowthIndividual(req, res) {
   `
   try {
     const result = await connection.execute(query);
+    console.log(result.rows);
     res.json({
       "assets": result.rows
     });
@@ -722,7 +724,7 @@ async function getPortfolioPercentGrowthWeighted(req, res) {
           WHERE sq.asset_ticker=tq.asset_ticker
           AND sq.date_calendar <= TO_DATE('${endDate}', 'YYYY-MM-DD')
         )
-    ), LatestCryptoQuotes AS (
+    ), EarliestCryptoQuotes AS (
           SELECT * FROM CryptoQuote tq
           WHERE CALENDAR_DATE = (
             SELECT MIN(sq.calendar_date)
@@ -730,7 +732,7 @@ async function getPortfolioPercentGrowthWeighted(req, res) {
             WHERE sq.asset_ticker=tq.asset_ticker
             AND sq.calendar_date >= TO_DATE('${startDate}', 'YYYY-MM-DD')
           )
-    ), EarliestCryptoQuotes AS (
+    ), LatestCryptoQuotes AS (
           SELECT * FROM CryptoQuote tq
           WHERE CALENDAR_DATE = (
             SELECT MAX(sq.calendar_date)
