@@ -265,7 +265,7 @@ export default class Cryptocurrency extends React.Component {
         </div>
 
         {/* Stock Market Comparison Section */}
-        <div className="container movies container">
+        <div className="container">
           <h3>
             Stock Market&nbsp;
           <small class="text-muted">Comparison</small>

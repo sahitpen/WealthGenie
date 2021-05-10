@@ -13,8 +13,6 @@ app.use(bodyParser.urlencoded({ extended: false }));
 /* ------------------- Route handler registration ----------------- */
 /* ---------------------------------------------------------------- */
 
-/* ---- (Dashboard) ---- */
-
 /* ---- (Sign Up) ---- */
 app.get('/signup/:email/:password', routes.signUp)
 

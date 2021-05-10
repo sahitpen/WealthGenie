@@ -1,5 +1,3 @@
-// Private. Will not be included in submission
-// Replace <Your Pennkey> and <Your Password>
 module.exports = {
   user: "admin",
   password: "adminpassword",

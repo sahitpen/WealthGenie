@@ -298,7 +298,7 @@ export default class Dashboard extends React.Component {
         </div>
 
         {/* Similar Companies Section */}
-        <div className="container movies-container">
+        <div className="container">
           <h3>
             Companies&nbsp;
             <small className="text-muted">with the closest returns to {this.state.ticker}</small>
@@ -320,7 +320,7 @@ export default class Dashboard extends React.Component {
         <br />
 
         {/* Other Companies Section */}
-        <div className="container movies-container">
+        <div className="container">
           <h3>
             Other&nbsp;
             <small className="text-muted">popular companies</small>
@@ -338,7 +338,7 @@ export default class Dashboard extends React.Component {
 
         {/* Industry Search Section */}
         <br />
-        <div className="container movies-container" >
+        <div className="container" >
           <h3>
             Industry&nbsp;
             <small className="text-muted">analysis</small>
