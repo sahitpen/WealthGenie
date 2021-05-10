@@ -23,7 +23,6 @@ app.get('/login/:email/:password', routes.login)
 app.get('/crypto/:ticker/:startDate/:endDate', routes.getCryptoData);
 app.get('/crypto/:ticker/:industry/:startDate/:endDate', routes.getCryptoComparisonData);
 
-
 /* ---- (Stock Search) ---- */
 app.get('/stock/:ticker/:startDate/:endDate', routes.getStockData);
 
