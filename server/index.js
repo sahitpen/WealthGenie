@@ -50,8 +50,9 @@ app.get('/removePortfolio/:id/:ticker', routes.removeAssetFromPortfolio);
 /* ---- (Update Portfolio Quantity) ---- */
 app.get('/updatePortfolio/:id/:ticker/:count', routes.updateAssetQuantity);
 
-/* ---- (Update Portfolio Quantity) ---- */
-app.get('/getPortfolioPercentGrowth/:id/individual', routes.getPortfolioPercentGrowthIndividual);
+/* ---- (Get Portfolio Percentage Growth) ---- */
+app.get('/getPortfolioPercentGrowth/individual/:id/:startDate/:endDate', routes.getPortfolioPercentGrowthIndividual);
+app.get('/getPortfolioPercentGrowth/weighted/:id/:startDate/:endDate', routes.getPortfolioPercentGrowthWeighted);
 
 
 app.listen(8081, () => {

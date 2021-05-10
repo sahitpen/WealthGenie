@@ -640,24 +640,42 @@ async function updateAssetQuantity(req, res) {
 async function getPortfolioPercentGrowthIndividual(req, res) {
   await init()
   var id = req.params.id;
+  var startDate = req.params.startDate;
+  var endDate = req.params.endDate;
 
   var query = `
-    WITH LatestStockQuotes AS (
-      SELECT asset_ticker, Close
-      FROM StockQuote sq
-      WHERE Date_Calendar=(SELECT max(Date_Calendar) FROM StockQuote sq2 WHERE sq.asset_ticker = sq2.asset_ticker)
-    ), EarliestStockQuotes AS (
-        SELECT asset_ticker, Close
+    WITH EarliestStockQuotes AS (
+      SELECT * FROM StockQuote tq
+      WHERE DATE_CALENDAR = (
+        SELECT MIN(sq.date_calendar)
         FROM StockQuote sq
-        WHERE Date_Calendar=(SELECT min(Date_Calendar) FROM StockQuote sq2 WHERE sq.asset_ticker = sq2.asset_ticker)
+        WHERE sq.asset_ticker=tq.asset_ticker
+        AND sq.date_calendar >= TO_DATE('${startDate}', 'YYYY-MM-DD')
+      )
+    ), LatestStockQuotes AS (
+        SELECT * FROM StockQuote tq
+        WHERE DATE_CALENDAR = (
+          SELECT MAX(sq.date_calendar)
+          FROM StockQuote sq
+          WHERE sq.asset_ticker=tq.asset_ticker
+          AND sq.date_calendar <= TO_DATE('${endDate}', 'YYYY-MM-DD')
+        )
     ), LatestCryptoQuotes AS (
-        SELECT asset_ticker, Close
-        FROM CryptoQuote cq
-        WHERE Calendar_Date=(SELECT max(Calendar_Date) FROM CryptoQuote cq2 WHERE cq.asset_ticker = cq2.asset_ticker)
+          SELECT * FROM CryptoQuote tq
+          WHERE CALENDAR_DATE = (
+            SELECT MIN(sq.calendar_date)
+            FROM CryptoQuote sq
+            WHERE sq.asset_ticker=tq.asset_ticker
+            AND sq.calendar_date >= TO_DATE('${startDate}', 'YYYY-MM-DD')
+          )
     ), EarliestCryptoQuotes AS (
-        SELECT asset_ticker, Close
-        FROM CryptoQuote cq
-        WHERE Calendar_Date=(SELECT min(Calendar_Date) FROM CryptoQuote cq2 WHERE cq.asset_ticker = cq2.asset_ticker)
+          SELECT * FROM CryptoQuote tq
+          WHERE CALENDAR_DATE = (
+            SELECT MAX(sq.calendar_date)
+            FROM CryptoQuote sq
+            WHERE sq.asset_ticker=tq.asset_ticker
+            AND sq.calendar_date <= TO_DATE('${endDate}', 'YYYY-MM-DD')
+          )
     )
     SELECT stock_ticker AS Ticker, esq.close as first_close, lsq.close AS last_close, ((lsq.close - esq.close) / esq.close * 100) as percent_growth
     FROM Portfolio_Has_Stock phs
@@ -671,11 +689,74 @@ async function getPortfolioPercentGrowthIndividual(req, res) {
     JOIN EarliestCryptoQuotes ecq ON ecq.asset_ticker = phc.crypto_ticker
     WHERE client_uid = '${id}'
   `
-  console.log(query)
   try {
     const result = await connection.execute(query);
     res.json({
       "assets": result.rows
+    });
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+async function getPortfolioPercentGrowthWeighted(req, res) {
+  await init()
+  var id = req.params.id;
+  var startDate = req.params.startDate;
+  var endDate = req.params.endDate;
+
+  var query = `
+    WITH EarliestStockQuotes AS (
+      SELECT * FROM StockQuote tq
+      WHERE DATE_CALENDAR = (
+        SELECT MIN(sq.date_calendar)
+        FROM StockQuote sq
+        WHERE sq.asset_ticker=tq.asset_ticker
+        AND sq.date_calendar >= TO_DATE('${startDate}', 'YYYY-MM-DD')
+      )
+    ), LatestStockQuotes AS (
+        SELECT * FROM StockQuote tq
+        WHERE DATE_CALENDAR = (
+          SELECT MAX(sq.date_calendar)
+          FROM StockQuote sq
+          WHERE sq.asset_ticker=tq.asset_ticker
+          AND sq.date_calendar <= TO_DATE('${endDate}', 'YYYY-MM-DD')
+        )
+    ), LatestCryptoQuotes AS (
+          SELECT * FROM CryptoQuote tq
+          WHERE CALENDAR_DATE = (
+            SELECT MIN(sq.calendar_date)
+            FROM CryptoQuote sq
+            WHERE sq.asset_ticker=tq.asset_ticker
+            AND sq.calendar_date >= TO_DATE('${startDate}', 'YYYY-MM-DD')
+          )
+    ), EarliestCryptoQuotes AS (
+          SELECT * FROM CryptoQuote tq
+          WHERE CALENDAR_DATE = (
+            SELECT MAX(sq.calendar_date)
+            FROM CryptoQuote sq
+            WHERE sq.asset_ticker=tq.asset_ticker
+            AND sq.calendar_date <= TO_DATE('${endDate}', 'YYYY-MM-DD')
+          )
+    )
+    SELECT ((SUM(last_value) - SUM(first_value))/SUM(first_value) * 100) as percentage_growth FROM (
+      SELECT stock_ticker AS Ticker, (esq.close*phs.stock_count) as first_value, (lsq.close*phs.stock_count) AS last_value
+      FROM Portfolio_Has_Stock phs
+      JOIN LatestStockQuotes lsq ON lsq.asset_ticker = phs.stock_ticker
+      JOIN EarliestStockQuotes esq ON esq.asset_ticker = phs.stock_ticker
+      WHERE client_uid = '${id}'
+      UNION ALL
+      SELECT crypto_ticker AS Ticker, (ecq.close*phc.crypto_count) as first_value, (lcq.close*phc.crypto_count) AS last_value
+      FROM Portfolio_Has_Crypto phc
+      JOIN LatestCryptoQuotes lcq ON lcq.asset_ticker = phc.crypto_ticker
+      JOIN EarliestCryptoQuotes ecq ON ecq.asset_ticker = phc.crypto_ticker
+      WHERE client_uid = '${id}'
+    )
+  `
+  try {
+    const result = await connection.execute(query);
+    res.json({
+      "growth": result.rows
     });
   } catch (err) {
     console.log(err);
@@ -695,5 +776,6 @@ module.exports = {
   removeAssetFromPortfolio: removeAssetFromPortfolio,
   updateAssetQuantity: updateAssetQuantity,
   getPortfolioPercentGrowthIndividual: getPortfolioPercentGrowthIndividual,
+  getPortfolioPercentGrowthWeighted: getPortfolioPercentGrowthWeighted,
   getCryptoComparisonData: getCryptoComparisonData
 };

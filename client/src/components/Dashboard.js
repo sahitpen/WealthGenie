@@ -115,7 +115,7 @@ export default class Dashboard extends React.Component {
   submitStockSearch(ticker, startDate, endDate) {
     if (!this.validateDates(startDate, endDate)) return;
     const formattedDates = this.convertDates(startDate, endDate)
-    fetch("http://localhost:8081/stock/" + ticker + "/" + formattedDates[0] + "/" + formattedDates[1],
+    fetch("http://localhost:8081/stock/" + ticker.toUpperCase() + "/" + formattedDates[0] + "/" + formattedDates[1],
       {
         method: 'GET' // The type of HTTP request.
       }).then(res => {
@@ -143,7 +143,7 @@ export default class Dashboard extends React.Component {
           )
         }
         this.setState({
-          ticker: ticker,
+          ticker: ticker.toUpperCase(),
           startDate: startDate,
           endDate: endDate,
           percentGrowth: stockData.growthResult[0][2].toFixed(2),

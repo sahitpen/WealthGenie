@@ -272,7 +272,7 @@ export default class Cryptocurrency extends React.Component {
           </h3>
           <form class="form-inline my-2 my-lg-0">
             <div class="input-group mb-3">
-              <select id="industryInput" class="form-select form-select-border-color">
+              <select id="industryInput" class="form-control">
                 {this.state.industryOptions}
               </select>
               <button class="form-control btn btn-outline-success my-2 my-sm-0" onClick={this.submitAssetSearch}>Search</button>

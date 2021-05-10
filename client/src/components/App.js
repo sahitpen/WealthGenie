@@ -47,7 +47,7 @@ export default class App extends React.Component {
 						/>
 						<Route
 							path="/portfolio"
-							render={() => <Portfolio loggedIn={this.state.loggedIn} user_id={this.state.id} changeLoginInfo={this.changeLoginInfo.bind(this)} />}
+							render={() => <Portfolio loggedIn={true} user_id={"allapk@seas.upenn.edu"} changeLoginInfo={this.changeLoginInfo.bind(this)} />}
 						/>
 					</Switch>
 				</Router>
