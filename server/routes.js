@@ -1,7 +1,5 @@
 const config = require('./db-config.js');
-const mysql = require('mysql');
 const oracle = require('oracledb');
-const e = require('express');
 oracle.autoCommit = true;
 
 var connection = null;
