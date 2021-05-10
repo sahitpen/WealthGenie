@@ -28,21 +28,20 @@ export default class Portfolio extends React.Component {
   };
 
   componentDidMount() {
-    this.getPortfolioAssets();
+    this.getPortfolioAssets(this.props.user_id);
   }
   componentDidUpdate() {
-    if (this.state.prevId != this.props.id) {
-      this.getPortfolioAssets();
-      this.setState({ prevId: this.props.id });
+    if (this.state.prevId != this.props.user_id) {
+      this.getPortfolioAssets(this.props.user_id);
+      this.setState({ prevId: this.props.user_id });
     }
   }
 
-  getPortfolioAssets() {
-    fetch("http://localhost:8081/getPortfolio/" + this.props.user_id,
+  getPortfolioAssets(user_id) {
+    fetch("http://localhost:8081/getPortfolio/" + user_id,
       {
         method: 'GET' // The type of HTTP request.
       }).then(res => {
-        console.log("http://localhost:8081/getPortfolio/" + this.props.user_id)
         return res.json()
       }, err => {
         console.log(err)
@@ -138,7 +137,7 @@ export default class Portfolio extends React.Component {
       }, err => {
         console.log(err);
       }).then(assetsData => {
-        this.getPortfolioAssets();
+        this.getPortfolioAssets(this.props.user_id);
       }, err => {
         console.log(err);
       });
@@ -153,7 +152,7 @@ export default class Portfolio extends React.Component {
     }, err => {
       console.log(err);
     }).then(assetsData => {
-      this.getPortfolioAssets();
+      this.getPortfolioAssets(this.props.user_id);
     }, err => {
       console.log(err);
     });
@@ -169,7 +168,7 @@ export default class Portfolio extends React.Component {
     }, err => {
       console.log(err);
     }).then(assetsData => {
-      this.getPortfolioAssets();
+      this.getPortfolioAssets(this.props.user_id);
     }, err => {
       console.log(err);
     });

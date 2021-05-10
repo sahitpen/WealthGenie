@@ -22,6 +22,7 @@ export default class PageNavbar extends React.Component {
 		};
 		this.signUp = this.signUp.bind(this);
 		this.login = this.login.bind(this);
+		this.logout = this.logout.bind(this);
 	};
 
 	componentDidMount() {
