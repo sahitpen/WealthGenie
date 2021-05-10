@@ -239,7 +239,7 @@ export default class Portfolio extends React.Component {
               <h5> Total Value: ${parseFloat(this.state.totalValue).toFixed(2)}</h5>
             </div>
 
-            <div className="container movies-container">
+            <div className="container">
               <table className="table table-hover">
                 <thead>
                   <tr>
@@ -294,7 +294,7 @@ export default class Portfolio extends React.Component {
             </div>
 
             <br />
-            <div className="container movies-container">
+            <div className="container">
               <table className="table table-hover">
                 <thead>
                   <tr>
@@ -336,7 +336,7 @@ export default class Portfolio extends React.Component {
 
             <br />
 
-            <div className="container movies-container">
+            <div className="container">
               <table className="table table-hover">
                 <thead>
                   <tr>
