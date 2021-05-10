@@ -56,6 +56,7 @@ async function signUp(req, res) {
 }
 
 async function login(req, res) {
+  await init();
   var email = req.params.email;
   var password = req.params.password;
 
@@ -691,6 +692,7 @@ async function getPortfolioPercentGrowthIndividual(req, res) {
   `
   try {
     const result = await connection.execute(query);
+    console.log(result.rows);
     res.json({
       "assets": result.rows
     });

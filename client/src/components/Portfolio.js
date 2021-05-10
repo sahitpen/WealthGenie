@@ -59,7 +59,7 @@ export default class Portfolio extends React.Component {
         console.log(err);
       });
 
-      this.getPortfolioGrowth(this.state.startDate, this.state.endDate);
+    this.getPortfolioGrowth(this.state.startDate, this.state.endDate);
   }
 
   getPortfolioGrowth(startDate, endDate) {
@@ -184,7 +184,7 @@ export default class Portfolio extends React.Component {
 
   submitGrowthSearch(e) {
     e.preventDefault()
-    this.setState( {
+    this.setState({
       startDate: document.getElementById('startDateInput').value || '2/8/2013',
       endDate: document.getElementById('endDateInput').value || '2/7/2018'
     })
@@ -252,27 +252,27 @@ export default class Portfolio extends React.Component {
                 </thead>
                 <tbody>
                   {
-                    this.state.portfolioAssets.map((assetData,i) =>(
+                    this.state.portfolioAssets.map((assetData, i) => (
                       <tr key={i}>
                         <th scope="row">{assetData[0]}</th>
                         <td>{parseFloat(assetData[2]).toFixed(2)}</td>
                         <td>
                           <div className="quantityDiv">
-                            <input className="assetQuantity form-control" type="text" placeholder="" value={assetData[1]} onChange={e=>this.handleQuantityChange(i, e.target.value)}></input>
+                            <input className="assetQuantity form-control" type="text" placeholder="" value={assetData[1]} onChange={e => this.handleQuantityChange(i, e.target.value)}></input>
                             <div className="input-group-append">
-                              <button className="btn btn-success" type="button" onClick={()=>this.updateStockQuantity(assetData[0], i)}><BsCheck /></button>
+                              <button className="btn btn-success" type="button" onClick={() => this.updateStockQuantity(assetData[0], i)}><BsCheck /></button>
                             </div>
                           </div>
                         </td>
                         <td>{parseFloat(assetData[3]).toFixed(2)}</td>
-                        <td><button className="btn btn-danger my-2 my-sm-0" onClick={()=>this.removeStockWithTicker(assetData[0])} >Remove</button></td>
+                        <td><button className="btn btn-secondary my-2 my-sm-0" onClick={() => this.removeStockWithTicker(assetData[0])} >Remove</button></td>
                       </tr>
                     ))
                   }
                 </tbody>
               </table>
             </div>
-            
+
             <br />
             <br />
 
@@ -306,7 +306,7 @@ export default class Portfolio extends React.Component {
                 </thead>
                 <tbody>
                   {
-                    this.state.assetsIndividualPercentGrowth.map((assetData,i) =>(
+                    this.state.assetsIndividualPercentGrowth.map((assetData, i) => (
                       <tr key={i}>
                         <th scope="row">{assetData[0]}</th>
                         <td>{parseFloat(assetData[1]).toFixed(2)}</td>
@@ -323,13 +323,13 @@ export default class Portfolio extends React.Component {
             <br />
 
             <div className="container d-flex justify-content-center" >
-            <h3>
+              <h3>
                 Add Asset&nbsp;
                 <small className="text-muted">to Portfolio:&nbsp;</small>
-              </h3> 
+              </h3>
               <form className="form-inline my-2 my-lg-0">
                 <div className="input-group mb-3">
-                  <input type="text" id="tickerInput" className="form-control" placeholder="Ticker" aria-label="Ticker" onChange={this.submitAssetSearch}/>
+                  <input type="text" id="tickerInput" className="form-control" placeholder="Ticker" aria-label="Ticker" onChange={this.submitAssetSearch} />
                 </div>
               </form>
             </div>
@@ -348,12 +348,12 @@ export default class Portfolio extends React.Component {
                 </thead>
                 <tbody>
                   {
-                    this.state.assetsToPotentiallyAdd.map((assetData,i) =>(
+                    this.state.assetsToPotentiallyAdd.map((assetData, i) => (
                       <tr key={i}>
                         <th scope="row">{assetData[0]}</th>
                         <td>{assetData[1]}</td>
                         <td>{assetData[2]}</td>
-                        <td><button className="btn btn-success my-2 my-sm-0" onClick={()=>this.addStockWithTicker(assetData[0])} >Add</button></td>
+                        <td><button className="btn btn-success my-2 my-sm-0" onClick={() => this.addStockWithTicker(assetData[0])} >Add</button></td>
                       </tr>
                     ))
                   }
@@ -368,10 +368,10 @@ export default class Portfolio extends React.Component {
             <br />
           </div>
           : <div className="container">
-              <div className="card bg-light loginMessage">
-                <h3>Please login in order to create/view your portfolio</h3>
-              </div>
+            <div className="card bg-light loginMessage">
+              <h3>Please login in order to create/view your portfolio</h3>
             </div>
+          </div>
         }
       </div >
     );
