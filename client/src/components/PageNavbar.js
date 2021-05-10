@@ -2,10 +2,10 @@ import React from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import Modal from "react-bootstrap/Modal";
 import {
-  BrowserRouter as Router,
-  Switch,
-  Route,
-  Link
+	BrowserRouter as Router,
+	Switch,
+	Route,
+	Link
 } from "react-router-dom";
 
 export default class PageNavbar extends React.Component {
@@ -43,10 +43,10 @@ export default class PageNavbar extends React.Component {
 	};
 
 	openLoginModal = () => this.setState({ isLoginOpen: true });
-  closeLoginModal = () => this.setState({ isLoginOpen: false });
+	closeLoginModal = () => this.setState({ isLoginOpen: false });
 
 	openSignUpModal = () => this.setState({ isSignUpOpen: true });
-  closeSignUpModal = () => this.setState({ isSignUpOpen: false });
+	closeSignUpModal = () => this.setState({ isSignUpOpen: false });
 
 	updateInput(type, value) {
 		if (type == "signUpEmail") {
@@ -74,22 +74,22 @@ export default class PageNavbar extends React.Component {
 			alert("The passwords do not match");
 		} else {
 			fetch("http://localhost:8081/signup/" + this.state.signUpEmail + "/" + this.state.signUpPass,
-      {
-        method: 'GET' // The type of HTTP request.
-      }).then(res => {
-        return res.json()
-      }, err => {
-        console.log(err);
-      }).then(loginInfo => {
-        if (loginInfo.id == null){
-					alert("An account already exists with this email");
-				} else {
-					alert("Created Account");
-					this.closeSignUpModal();
-				}
-      }, err => {
-        console.log(err);
-      });
+				{
+					method: 'GET' // The type of HTTP request.
+				}).then(res => {
+					return res.json()
+				}, err => {
+					console.log(err);
+				}).then(loginInfo => {
+					if (loginInfo.id == null) {
+						alert("An account already exists with this email");
+					} else {
+						alert("Created Account");
+						this.closeSignUpModal();
+					}
+				}, err => {
+					console.log(err);
+				});
 		}
 	}
 
@@ -101,22 +101,22 @@ export default class PageNavbar extends React.Component {
 			alert("The email entered is invalid");
 		} else {
 			fetch("http://localhost:8081/login/" + this.state.loginEmail + "/" + this.state.loginPass,
-      {
-        method: 'GET' // The type of HTTP request.
-      }).then(res => {
-        return res.json()
-      }, err => {
-        console.log(err);
-      }).then(loginInfo => {
-        if (loginInfo.id == null){
-					alert("The email or password is incorrect");
-				} else {
-					this.props.changeLoginInfo(loginInfo.id, true)
-					this.closeLoginModal();
-				}
-      }, err => {
-        console.log(err);
-      });
+				{
+					method: 'GET' // The type of HTTP request.
+				}).then(res => {
+					return res.json()
+				}, err => {
+					console.log(err);
+				}).then(loginInfo => {
+					if (loginInfo.id == null) {
+						alert("The email or password is incorrect");
+					} else {
+						this.props.changeLoginInfo(loginInfo.id, true)
+						this.closeLoginModal();
+					}
+				}, err => {
+					console.log(err);
+				});
 		}
 	}
 
@@ -140,9 +140,9 @@ export default class PageNavbar extends React.Component {
 					{loggedIn
 						? <button className="btn btn-primary my-2 my-sm-0" onClick={this.logout}>Logout</button>
 						: <div className="navbarButtons">
-								<button className="btn btn-secondary my-2 my-sm-0" onClick={this.openSignUpModal}>Sign Up</button>
-								<button className="btn btn-primary my-2 my-sm-0" onClick={this.openLoginModal}>Login</button>
-							</div>
+							<button className="btn btn-secondary my-2 my-sm-0" onClick={this.openSignUpModal}>Sign Up</button>
+							<button className="btn btn-success my-2 my-sm-0" onClick={this.openLoginModal}>Login</button>
+						</div>
 					}
 				</nav>
 
@@ -154,15 +154,15 @@ export default class PageNavbar extends React.Component {
 						<form>
 							<div className="form-group">
 								<label>Email: </label>
-								<input type="email" className="form-control" placeholder="Enter email" onChange={(e)=>this.updateInput('signUpEmail', e.target.value)} />
+								<input type="email" className="form-control" placeholder="Enter email" onChange={(e) => this.updateInput('signUpEmail', e.target.value)} />
 							</div>
 							<div className="form-group">
 								<label>Password: </label>
-								<input type="password" className="form-control" placeholder="Enter password"  onChange={(e)=>this.updateInput('signUpPass', e.target.value)} />
+								<input type="password" className="form-control" placeholder="Enter password" onChange={(e) => this.updateInput('signUpPass', e.target.value)} />
 							</div>
 							<div className="form-group">
 								<label>Re-enter Password: </label>
-								<input type="password" className="form-control" placeholder="Enter password"  onChange={(e)=>this.updateInput('signUpPass2', e.target.value)} />
+								<input type="password" className="form-control" placeholder="Enter password" onChange={(e) => this.updateInput('signUpPass2', e.target.value)} />
 							</div>
 						</form>
 					</Modal.Body>
@@ -179,11 +179,11 @@ export default class PageNavbar extends React.Component {
 						<form>
 							<div className="form-group">
 								<label>Email: </label>
-								<input type="email" className="form-control" placeholder="Enter email"  onChange={(e)=>this.updateInput('loginEmail', e.target.value)}/>
+								<input type="email" className="form-control" placeholder="Enter email" onChange={(e) => this.updateInput('loginEmail', e.target.value)} />
 							</div>
 							<div className="form-group">
 								<label>Password: </label>
-								<input type="password" className="form-control" placeholder="Enter password"  onChange={(e)=>this.updateInput('loginPass', e.target.value)}/>
+								<input type="password" className="form-control" placeholder="Enter password" onChange={(e) => this.updateInput('loginPass', e.target.value)} />
 							</div>
 						</form>
 					</Modal.Body>
@@ -192,7 +192,7 @@ export default class PageNavbar extends React.Component {
 					</Modal.Footer>
 				</Modal>
 			</div>
-			
+
 		);
 	};
 };
