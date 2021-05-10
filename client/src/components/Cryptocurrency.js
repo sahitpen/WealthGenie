@@ -183,23 +183,21 @@ export default class Cryptocurrency extends React.Component {
       });
   }
 
-
-
   render() {
     return (
       <div className="Dashboard">
 
         <PageNavbar active="dashboard" />
-
         <br />
 
+        {/* Title Section */}
         <div className="container d-flex justify-content-center" >
           <h3> Historical Data for <span style={{ color: '#73DA8C' }}>Bitcoin</span>
           </h3>
         </div>
-
         <br />
 
+        {/* Search Section */}
         <div className="container d-flex justify-content-center" >
           <form class="form-inline my-2 my-lg-0">
             <div class="input-group mb-3">
@@ -209,17 +207,16 @@ export default class Cryptocurrency extends React.Component {
             </div>
           </form>
         </div>
-
         <br />
 
+
+        {/* Bitcoin Data Section */}
         <div className="container">
           <h3>
             Bitcoin&nbsp;
           </h3>
         </div>
-
         <div className="container">
-
           <div class="card-columns">
             <div class="card text-white bg-success mb-3">
               <div class="card-header">Growth of Bitcoin</div>
@@ -266,6 +263,7 @@ export default class Cryptocurrency extends React.Component {
           </div>
         </div>
 
+        {/* Stock Market Comparison Section */}
         <div className="container movies container">
           <h3>
             Stock Market&nbsp;
@@ -280,7 +278,6 @@ export default class Cryptocurrency extends React.Component {
             </div>
           </form>
         </div>
-
         <div className="container" style={{ height: '700px', overflow: 'scroll' }}>
           <table class="table table-hover">
             <thead>
