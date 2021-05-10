@@ -30,10 +30,8 @@ export default class PageNavbar extends React.Component {
 
 		let navbarDivs = pageList.map((page, i) => {
 			if (this.props.active === page) {
-				//return <a className="nav-item nav-link active" key={i} href={"/" + page}>{page.charAt(0).toUpperCase() + page.substring(1, page.length)}</a>
 				return <Link className="nav-item nav-link active" key={i} to={"/" + page}>{page.charAt(0).toUpperCase() + page.substring(1, page.length)}</Link>
 			} else {
-				//return <a className="nav-item nav-link" key={i} href={"/" + page}>{page.charAt(0).toUpperCase() + page.substring(1, page.length)}</a>
 				return <Link className="nav-item nav-link" key={i} to={"/" + page}>{page.charAt(0).toUpperCase() + page.substring(1, page.length)}</Link>
 			}
 		});

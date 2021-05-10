@@ -105,8 +105,6 @@ export default class Portfolio extends React.Component {
 
   submitAssetSearch(e) {
     const ticker = document.getElementById('tickerInput').value.toUpperCase();
-    const startDate = '';
-    const endDate = '';
     e.preventDefault()
     console.log("button hit");
     fetch("http://localhost:8081/portfolio/" + ticker,
@@ -145,33 +143,33 @@ export default class Portfolio extends React.Component {
 
   removeStockWithTicker(ticker) {
     fetch("http://localhost:8081/removePortfolio/" + this.props.user_id + "/" + ticker,
-    {
-      method: 'GET' // The type of HTTP request.
-    }).then(res => {
-      return res.json()
-    }, err => {
-      console.log(err);
-    }).then(assetsData => {
-      this.getPortfolioAssets(this.props.user_id);
-    }, err => {
-      console.log(err);
-    });
+      {
+        method: 'GET' // The type of HTTP request.
+      }).then(res => {
+        return res.json()
+      }, err => {
+        console.log(err);
+      }).then(assetsData => {
+        this.getPortfolioAssets(this.props.user_id);
+      }, err => {
+        console.log(err);
+      });
   }
 
   updateStockQuantity(ticker, index) {
     var count = this.state.portfolioAssets[index][1]
     fetch("http://localhost:8081/updatePortfolio/" + this.props.user_id + "/" + ticker + "/" + count,
-    {
-      method: 'GET' // The type of HTTP request.
-    }).then(res => {
-      return res.json()
-    }, err => {
-      console.log(err);
-    }).then(assetsData => {
-      this.getPortfolioAssets(this.props.user_id);
-    }, err => {
-      console.log(err);
-    });
+      {
+        method: 'GET' // The type of HTTP request.
+      }).then(res => {
+        return res.json()
+      }, err => {
+        console.log(err);
+      }).then(assetsData => {
+        this.getPortfolioAssets(this.props.user_id);
+      }, err => {
+        console.log(err);
+      });
   }
 
   handleQuantityChange(i, value) {
